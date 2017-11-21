@@ -1,0 +1,16 @@
+/* stylesheet for your custom graph */
+
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #888;
+  stroke-opacity: .8;
+}
+
+.cross-link {
+  stroke: #aaa;
+  stroke-opacity: .4;
+}
