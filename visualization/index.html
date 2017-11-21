@@ -57,6 +57,7 @@
 		"links": _city_links
 	};
 
-	d3Graph.forceDirected("force-svg", _graph);
+	// d3Graph.forceDirected("force-svg", _graph);
+	locateEmptyCities(_graph);
 	d3Graph.mapBased("map-svg", _graph);
 </script>

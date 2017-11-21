@@ -7,6 +7,35 @@
 
 // var WIDTH = 800, HEIGHT = 800;
 
+var locateEmptyCities = function (graph){
+    // console.log(graph.nodes);
+    _.map(graph.nodes, function(node){
+        console.log(node);
+        if (node.area_code == "024Y"){
+            node.lat = 41.8057;
+            node.lng = 123.4315;
+        }
+        else if (node.area_code == "028Y"){
+            node.lat = 30.5728;
+            node.lng = 104.0668;
+        }
+        else if (node.area_code == "029Y"){
+            node.lat = 34.3416;
+            node.lng = 108.9398;
+        }
+        else if (node.area_code == "760Y"){
+            node.lat = 22.31;
+            node.lng = 113.23;
+        }
+        else if (node.area_code == "575Y"){
+            node.lat = 29.9958;
+            node.lng = 120.5861;
+            console.log(node);
+        }
+    });
+    console.log(graph.nodes);
+};
+
 var d3Graph = {
     // 
     forceDirected: function(dom, graph) {
@@ -152,8 +181,8 @@ var d3Graph = {
                 .on("dragend", dragended);
             color = d3.scale.category20();
          
-        var width = 1200, height = 1200;
-         
+        var width = 1200, height = 1000;
+        
         var proj = d3.geo.mercator().center([105, 38]).scale(1000).translate([width/2, height/2]),
             path = d3.geo.path().projection(proj);
          
@@ -200,88 +229,78 @@ var d3Graph = {
 
 
 
-        // Plot graph
-        var force = d3.layout.force()
-            .charge(-120)
-            .gravity(0.2)
-            .linkDistance(50)
-            .size([width, height]);
 
-        force
-            .nodes(graph.nodes)
-            .links(graph.links)
-            .start();
 
         container.append("svg")
             .attr("width", width)
             .attr("height", height)
 
-        // define the nodes
-
-        var groupInfo = {};
-        var index = 0;
-
-        graph.nodes.forEach(function(d) {
-            groupInfo[index] = d.group;
-            index ++;
+        graph.links.forEach(function(d) {
+            d.source = graph.nodes[d.source];
+            d.target = graph.nodes[d.target];
+            source_cood = proj([d.source.lng, d.source.lat]);
+            target_cood = proj([d.target.lng, d.target.lat]);
+            d.source.x = source_cood[0];
+            d.source.y = source_cood[1];
+            d.target.x = target_cood[0];
+            d.target.y = target_cood[1];
         });
 
-        var node = container.selectAll(".node")
-            .data(graph.nodes)
-            .enter().append("g")
+        var link = container.append("g")
+            .attr("class", "link")
+            .selectAll("line")
+            .data(graph.links)
+            .enter().append("line")
+            .attr("x1", function(d) { return d.source.x; })
+            .attr("y1", function(d) { return d.source.y; })
+            .attr("x2", function(d) { return d.target.x; })
+            .attr("y2", function(d) { return d.target.y; })
+            .style("stroke-width", function(d) { return Math.sqrt(d.value); });
 
-        var nodeMap = {};
-        node.append("circle")
+        var node = container.append("g")
             .attr("class", "node")
+            .selectAll("circle")
+            .data(graph.nodes)
+            .enter().append("circle")
             .attr("transform", function(d) { return "translate(" + proj([d.lng, d.lat]) + ")"; })
             .attr("r", function(d)  { return d.company_num/2000 > 8 ? 8 : (d.company_num/2000 < 1 ? 1 : d.company_num / 2000);})
             .style("fill", function(d) {
-                nodeMap[d.index] = d;
-                return color(d.company_num/10000);
+                 return color(d.company_num/10000);
             });
 
-        node.append("text")
+        var text = container.append("g")
+            .attr("class", "text")
+            .selectAll("string")
+            .data(graph.nodes)
+            .enter().append("text")
             .attr("transform", function(d) { return "translate(" + proj([d.lng, d.lat]) + ")"; })
             .attr("dx", "1em")
             .attr("dy", "-0.1em")
             .style("font-size", "5px")
             .text(function(d) { return d.city_name; });
 
-        var newLinks   = [],
-            crossLinks = [];
-        graph.links.forEach(function(d) {
-            if (groupInfo[d.source] === groupInfo[d.target]) {
-                newLinks.push(d);
-            } else {
-                crossLinks.push(d);
-            }
-        });
+        // var node = container.selectAll(".node")
+        //     .data(graph.nodes)
+        //     .enter().append("g")
 
-        graph.links = newLinks;
+        // // var nodeMap = {};
+        // node.append("circle")
+        //     .attr("class", "node")
+        //     .attr("transform", function(d) { return "translate(" + proj([d.lng, d.lat]) + ")"; })
+        //     .attr("r", function(d)  { return d.company_num/2000 > 8 ? 8 : (d.company_num/2000 < 1 ? 1 : d.company_num / 2000);})
+        //     .style("fill", function(d) {
+        //         // nodeMap[d.index] = d;
+        //         return color(d.company_num/10000);
+        //     });
 
-        var link = container.selectAll(".link")
-            .data(graph.links)
-            .enter().append("line")
-            .attr("class", "link")
-            .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+        // node.append("text")
+        //     .attr("transform", function(d) { return "translate(" + proj([d.lng, d.lat]) + ")"; })
+        //     .attr("dx", "1em")
+        //     .attr("dy", "-0.1em")
+        //     .style("font-size", "5px")
+        //     .text(function(d) { return d.city_name; });
 
-        // link.attr("x1", function(d) { return d.source.x; })
-        //     .attr("y1", function(d) { return d.source.y; })
-        //     .attr("x2", function(d) { return d.target.x; })
-        //     .attr("y2", function(d) { return d.target.y; });
 
-        var crosslink = container.selectAll(".cross-link")
-            .data(crossLinks)
-            .enter().append("line")
-            .attr("x1", function(d) { return nodeMap[d.source].x; })
-            .attr("y1", function(d) { return nodeMap[d.source].y; })
-            .attr("x2", function(d) { return nodeMap[d.target].x; })
-            .attr("y2", function(d) { return nodeMap[d.target].y; })
-            .attr("class", "cross-link")
-            .style("stroke-width", function(d) { return Math.sqrt(d.value * 10); })
-            .style("stroke", function(d){
-                  return color(d.value);
-                  });
 
 
     }
