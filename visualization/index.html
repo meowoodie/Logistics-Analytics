@@ -1,15 +1,27 @@
-<!-- IMPORTANT GUIDELINES
-1. div #canvas wraps this html block. 
-2. div #canvas-svg is used for svg rendering. It can be placed anywhere here.
-3. Do not define an html page here, i.e. including html, head, body tags. -->
+<!-- 
+	Demo of Grafico
 
-<div id="canvas-svg"></div>
+	The html is a static page for presenting couples of examples of graphs in Grafico. 
+	Most of the visualization of graphs are supported by D3.js. And some other basic statistics
+	are depended on other 3rd party opensource packages. 
+
+	1. Force directed graph
+	2. Map based graph
+-->
+
+<!-- HTML dom -->
+<div id="force-svg"></div>
+<div id="map-svg"></div>
+
+<!-- JQuery -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <!-- Underscore -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 <!-- D3.js -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.4/nv.d3.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.5/nv.d3.min.js"></script>
+<script src="https://d3js.org/topojson.v1.min.js"></script>
 <!-- Customized css -->
 <link rel="stylesheet" type="text/css" href="graph.css" media="screen" />
 
@@ -17,31 +29,34 @@
 <script src="graph.js"></script>
 
 <!-- Hardcode dataset (in avoid of hosting a http server) -->
-<!-- <script src="test_data.js"></script> -->
-<script src="graph/nodes.js"></script>
-<script src="graph/links.js"></script>
+<script src="data/city_nodes.js"></script>
+<script src="data/city_links.js"></script>
+<script src="data/china_cities.js"></script>
+<script src="data/china_provinces.js"></script>
+
 <!-- Main function -->
 <script type="text/javascript">
 	var MIN_VALUE = 0,
-		MAX_VALUE = _.max(links, function(link){ return link.value }).value;
+		MAX_VALUE = _.max(city_links, function(link){ return link.value }).value;
 
-	var cities = _.keys(nodes),
-		_nodes = _.chain(nodes)
+	var cities = _.keys(city_nodes),
+		_city_nodes = _.chain(city_nodes)
 			.values()
 			.map(function(node){
 				node.group = _.indexOf(cities, node.city_name);
 				return node; })
 			.value(),
-		_links = _.map(links, function(link){
+		_city_links = _.map(city_links, function(link){
 				link.source = _.indexOf(cities, link.source);
 				link.target = _.indexOf(cities, link.target);
 				link.value = link.value > MIN_VALUE ? (link.value - MIN_VALUE) / MAX_VALUE : 0;
 				return link; });
 
 	var _graph  = {
-		"nodes": _nodes,
-		"links": _links
+		"nodes": _city_nodes,
+		"links": _city_links
 	};
 
-	drawD3Document(_graph);
+	d3Graph.forceDirected("force-svg", _graph);
+	d3Graph.mapBased("map-svg", _graph);
 </script>
