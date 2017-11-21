@@ -92,6 +92,7 @@ class Graph():
 
 	def load(self, path):
 		'''
+		Load existed json file of graph
 		'''
 		nodes_path = '%s/nodes.json' % path
 		links_path = '%s/links.json' % path
@@ -113,7 +114,7 @@ class Graph():
 
 	def save(self, path):
 		'''
-
+		Save the graph into json files
 		'''
 		if os.path.exists(path) and os.path.isdir(path):
 			nodes_str = json.dumps(self.nodes)
@@ -225,6 +226,7 @@ class SfExpressGraph(Graph):
 class MapBasedGraph(SfExpressGraph):
 	'''
 	'''
+
 	def __init__(self):
 		# Initialize sf-express graph object
 		SfExpressGraph.__init__(self, iterobj=None)
