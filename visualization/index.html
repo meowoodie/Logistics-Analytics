@@ -10,6 +10,7 @@
 -->
 
 <!-- HTML dom -->
+
 <div id="force-svg"></div>
 <div id="map-svg"></div>
 
@@ -21,7 +22,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.4/nv.d3.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.5/nv.d3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script src="https://d3js.org/topojson.v1.min.js"></script>
+<!-- Chart.js-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js"></script>>
 <!-- Customized css -->
 <link rel="stylesheet" type="text/css" href="graph.css" media="screen" />
 
@@ -52,12 +56,14 @@
 				link.value = link.value > MIN_VALUE ? (link.value - MIN_VALUE) / MAX_VALUE : 0;
 				return link; });
 
-	var _graph  = {
+	var graph1  = {
 		"nodes": _city_nodes,
 		"links": _city_links
 	};
 
-	// d3Graph.forceDirected("force-svg", _graph);
-	locateEmptyCities(_graph);
-	d3Graph.mapBased("map-svg", _graph);
+	var graph2 = JSON.parse(JSON.stringify( graph1 ));
+	
+	d3Graph.forceDirected("force-svg", graph1);
+	locateEmptyCities(graph2);
+	d3Graph.mapBased("map-svg", graph2);
 </script>

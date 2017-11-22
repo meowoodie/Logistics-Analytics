@@ -10,7 +10,6 @@
 var locateEmptyCities = function (graph){
     // console.log(graph.nodes);
     _.map(graph.nodes, function(node){
-        console.log(node);
         if (node.area_code == "024Y"){
             node.lat = 41.8057;
             node.lng = 123.4315;
@@ -30,11 +29,18 @@ var locateEmptyCities = function (graph){
         else if (node.area_code == "575Y"){
             node.lat = 29.9958;
             node.lng = 120.5861;
-            console.log(node);
         }
     });
-    console.log(graph.nodes);
 };
+
+var dynamicColors = function() {
+    var r = Math.floor(Math.random() * 255);
+    var g = Math.floor(Math.random() * 255);
+    var b = Math.floor(Math.random() * 255);
+    return "rgb(" + r + "," + g + "," + b + ")";
+}
+
+var colorBar = _.map(new Array(12), function(){return dynamicColors();})
 
 var d3Graph = {
     // 
@@ -208,16 +214,6 @@ var d3Graph = {
             .attr("class", function(d) { return "q" + map.get(d.id); })
             .attr("d", path)
             .attr("id", function(d) {return d.id;});
-            // .on("mouseover", function(d) {
-            //     var m = d3.mouse(d3.select("#"+dom).node());
-            //     tooltip.style("display", null)
-            //         .style("left", m[0] + 10 + "px")
-            //         .style("top", m[1] - 10 + "px");
-            //     $("#tt_county").text(d.properties.name);
-            // })
-            // .on("mouseout", function() {
-            //     tooltip.style("display", "none");
-            // });
      
         container.append("g")
             .attr("class", "states")
@@ -227,10 +223,15 @@ var d3Graph = {
             .append("path")
             .attr("d", path);
 
+        var tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-30, 0])
+            .html(function(d) {
+                return "<div><p>"+ d.city_name + '</p><canvas id="pie-chart" width="400" height="400"></canvas><div>';
+            });
 
-
-
-
+        container.call(tip);
+        
         container.append("svg")
             .attr("width", width)
             .attr("height", height)
@@ -264,8 +265,42 @@ var d3Graph = {
             .enter().append("circle")
             .attr("transform", function(d) { return "translate(" + proj([d.lng, d.lat]) + ")"; })
             .attr("r", function(d)  { return d.company_num/2000 > 8 ? 8 : (d.company_num/2000 < 1 ? 1 : d.company_num / 2000);})
-            .style("fill", function(d) {
-                 return color(d.company_num/10000);
+            // .attr("id", function(d) { return "node-" + d.area_code; })
+            .style("fill", "Green")
+            // .style("fill", function(d) {
+            //      return color(d.company_num/10000);
+            // })
+            .on("mouseover", function(d) {
+                d3.select(this)
+                    .transition()
+                    .duration(500)
+                    // .attr("x", function(d) { return d.x; }) //The bar moves to the left a bit
+                    .style("cursor", "pointer")
+                    .attr("r", 20) // The bar becomes larger
+                    .style("fill", "Red");
+                tip.show(d);
+                // generating content of tip graph
+                var ctx = $("#pie-chart");
+                var industData = {
+                    datasets: [{
+                        data: _.values(d.industry_lv1_dist),
+                        backgroundColor: colorBar
+                    }],
+                    labels: _.keys(d.industry_lv1_dist)
+                };
+                var industDoughnutChart = new Chart(ctx,{
+                    type: 'doughnut',
+                    data: industData
+                }); 
+            })
+            .on("mouseout", function() {
+                d3.select(this)
+                    .transition()
+                    .duration(500)
+                    .style("cursor", "normal")
+                    .attr("r", function(d)  { return d.company_num/2000 > 8 ? 8 : (d.company_num/2000 < 1 ? 1 : d.company_num / 2000);})
+                    .style("fill", "Green");
+                tip.hide();
             });
 
         var text = container.append("g")
@@ -278,30 +313,6 @@ var d3Graph = {
             .attr("dy", "-0.1em")
             .style("font-size", "5px")
             .text(function(d) { return d.city_name; });
-
-        // var node = container.selectAll(".node")
-        //     .data(graph.nodes)
-        //     .enter().append("g")
-
-        // // var nodeMap = {};
-        // node.append("circle")
-        //     .attr("class", "node")
-        //     .attr("transform", function(d) { return "translate(" + proj([d.lng, d.lat]) + ")"; })
-        //     .attr("r", function(d)  { return d.company_num/2000 > 8 ? 8 : (d.company_num/2000 < 1 ? 1 : d.company_num / 2000);})
-        //     .style("fill", function(d) {
-        //         // nodeMap[d.index] = d;
-        //         return color(d.company_num/10000);
-        //     });
-
-        // node.append("text")
-        //     .attr("transform", function(d) { return "translate(" + proj([d.lng, d.lat]) + ")"; })
-        //     .attr("dx", "1em")
-        //     .attr("dy", "-0.1em")
-        //     .style("font-size", "5px")
-        //     .text(function(d) { return d.city_name; });
-
-
-
 
     }
 }; 
