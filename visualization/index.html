@@ -11,8 +11,8 @@
 
 <!-- HTML dom -->
 
-<div id="force-svg"></div>
 <div id="map-svg"></div>
+<div id="force-svg"></div>
 
 <!-- JQuery -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -35,13 +35,15 @@
 <!-- Hardcode dataset (in avoid of hosting a http server) -->
 <script src="data/city_nodes.js"></script>
 <script src="data/city_links.js"></script>
+<script src="data/industry_nodes.js"></script>
+<script src="data/industry_links.js"></script>
 <script src="data/china_cities.js"></script>
 <script src="data/china_provinces.js"></script>
 
 <!-- Main function -->
 <script type="text/javascript">
-	var MIN_VALUE = 0,
-		MAX_VALUE = _.max(city_links, function(link){ return link.value }).value;
+	var CITY_MIN_VALUE = 0,
+		CITY_MAX_VALUE = _.max(city_links, function(link){ return link.value }).value;
 
 	var cities = _.keys(city_nodes),
 		_city_nodes = _.chain(city_nodes)
@@ -53,17 +55,49 @@
 		_city_links = _.map(city_links, function(link){
 				link.source = _.indexOf(cities, link.source);
 				link.target = _.indexOf(cities, link.target);
-				link.value = link.value > MIN_VALUE ? (link.value - MIN_VALUE) / MAX_VALUE : 0;
+				link.value = link.value > CITY_MIN_VALUE ? (link.value - CITY_MIN_VALUE) / CITY_MAX_VALUE : 0;
 				return link; });
 
-	var graph1  = {
+	var graph1 = {
 		"nodes": _city_nodes,
 		"links": _city_links
 	};
 
-	var graph2 = JSON.parse(JSON.stringify( graph1 ));
-	
-	d3Graph.forceDirected("force-svg", graph1);
-	locateEmptyCities(graph2);
-	d3Graph.mapBased("map-svg", graph2);
+	// var graph2 = JSON.parse(JSON.stringify( graph1 )); // deep copy
+	// d3Graph.forceDirected("force-svg", graph1);
+
+	locateEmptyCities(graph1);
+	d3Graph.mapBased("map-svg", graph1);
+
+	var INDUST_MIN_VALUE = 0,
+		INDUST_MAX_VALUE = _.max(industry_links, function(link){ return link.value }).value;
+
+	var industs_lv3 = _.keys(industry_nodes),
+		industs_lv1 = _.chain(industry_nodes)
+			.map(function(node){return node['industry_lv1']})
+			.uniq()
+			.value(),
+		_industry_nodes = _.chain(industry_nodes)
+			.values()
+			.map(function(node){
+				node.group = _.indexOf(industs_lv1, node.industry_lv1); 
+				return node; })
+			.value(),
+		_industry_links = _.map(industry_links, function(link){
+			link.source = _.indexOf(industs_lv3, link.source); 
+			link.target = _.indexOf(industs_lv3, link.target); 
+			link.value = link.value > INDUST_MIN_VALUE ? (link.value - INDUST_MIN_VALUE) / INDUST_MAX_VALUE : 0; 
+			return link; });
+
+		console.log(_industry_nodes.slice(1,5));
+		console.log(_industry_links.slice(1,5));
+
+	var graph2 = {
+		"nodes": _industry_nodes,
+		"links": _industry_links
+	};
+
+	d3Graph.forceDirected("force-svg", graph2);
+
+
 </script>

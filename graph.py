@@ -170,7 +170,7 @@ class SfExpressGraph(Graph):
 		raw records
 		'''
 
-		# # Terms about company information
+		# Terms about company information
 		company_pair = [ record[0:10], record[13:23] ]
 		# Terms about transaction information
 		transac_info = record[10:13] + [ record[0], record[13] ]
@@ -223,6 +223,8 @@ class SfExpressGraph(Graph):
 			link['deliver_time'] = None if link['deliver_time'] == 'NULL' \
 				else arrow.get(link['deliver_time'], 'YYYY-MM-DD HH:mm:ss').timestamp
 
+
+
 class MapBasedGraph(SfExpressGraph):
 	'''
 	'''
@@ -230,14 +232,13 @@ class MapBasedGraph(SfExpressGraph):
 	def __init__(self):
 		# Initialize sf-express graph object
 		SfExpressGraph.__init__(self, iterobj=None)
-		# Load SF-Express Graph from file
 
-	def build(self, path):
+	def load(self, path):
 		'''
 		'''
 		super(SfExpressGraph, self).load(path)
 		# Initialize new links
-		mp_links = defaultdict(lambda: {
+		mb_links = defaultdict(lambda: {
 			'source': None, 'target': None, 'value': 0
 			})
 		# Reorganize links
@@ -245,13 +246,13 @@ class MapBasedGraph(SfExpressGraph):
 			source = self.nodes[link['ship_compony_id']]['area_city']['city_name']
 			target = self.nodes[link['deliver_company_id']]['area_city']['city_name']
 			key = '%s %s' % (source, target)
-			mp_links[key]['source'] = source
-			mp_links[key]['target'] = target
-			mp_links[key]['value'] += 1
+			mb_links[key]['source'] = source
+			mb_links[key]['target'] = target
+			mb_links[key]['value'] += 1
 		# Update links
-		self.links = list(mp_links.values())
+		self.links = list(mb_links.values())
 		# Initialize and define new nodes structure
-		mp_nodes = defaultdict(lambda: {
+		mb_nodes = defaultdict(lambda: {
 			'city_name': None, 'lat': None, 'lng': None,
 			'area_code': None, 'area_desc': None,
 			'company_num': 0, 'oversea_num': 0,
@@ -262,25 +263,75 @@ class MapBasedGraph(SfExpressGraph):
 			})
 		# Reorganize nodes
 		for company_id, company_info in self.nodes.items():
-			mp_nodes[company_info['area_city']['city_name']]['city_name'] = \
+			mb_nodes[company_info['area_city']['city_name']]['city_name'] = \
 				company_info['area_city']['city_name']
-			mp_nodes[company_info['area_city']['city_name']]['lat'] = \
+			mb_nodes[company_info['area_city']['city_name']]['lat'] = \
 				company_info['area_city']['lat']
-			mp_nodes[company_info['area_city']['city_name']]['lng'] = \
+			mb_nodes[company_info['area_city']['city_name']]['lng'] = \
 				company_info['area_city']['lng']
-			mp_nodes[company_info['area_city']['city_name']]['area_code'] = \
+			mb_nodes[company_info['area_city']['city_name']]['area_code'] = \
 				company_info['area_code']
-			mp_nodes[company_info['area_city']['city_name']]['area_desc'] = \
+			mb_nodes[company_info['area_city']['city_name']]['area_desc'] = \
 				company_info['area_desc']
-			mp_nodes[company_info['area_city']['city_name']]['company_num'] += 1
-			mp_nodes[company_info['area_city']['city_name']]['oversea_num'] += 1 \
+			mb_nodes[company_info['area_city']['city_name']]['company_num'] += 1
+			mb_nodes[company_info['area_city']['city_name']]['oversea_num'] += 1 \
 				if company_info['oversea'] else 0
-			mp_nodes[company_info['area_city']['city_name']]['coop_months_dist'][company_info['coop_months']] += 1
-			mp_nodes[company_info['area_city']['city_name']]['industry_lv1_dist'][company_info['industry_lv1']] += 1
-			mp_nodes[company_info['area_city']['city_name']]['industry_lv2_dist'][company_info['industry_lv2']] += 1
-			mp_nodes[company_info['area_city']['city_name']]['industry_lv3_dist'][company_info['industry_lv3']] += 1
+			mb_nodes[company_info['area_city']['city_name']]['coop_months_dist'][company_info['coop_months']] += 1
+			mb_nodes[company_info['area_city']['city_name']]['industry_lv1_dist'][company_info['industry_lv1']] += 1
+			mb_nodes[company_info['area_city']['city_name']]['industry_lv2_dist'][company_info['industry_lv2']] += 1
+			mb_nodes[company_info['area_city']['city_name']]['industry_lv3_dist'][company_info['industry_lv3']] += 1
 		# Update nodes
-		self.nodes = mp_nodes
+		self.nodes = mb_nodes
+
+
+
+class ForceDirectedGraph(SfExpressGraph):
+	'''
+	'''
+
+	def __init__(self):
+		# Initialize sf-express graph object
+		SfExpressGraph.__init__(self, iterobj=None)
+
+	def load(self, path):
+		'''
+		'''
+		super(SfExpressGraph, self).load(path)
+		# Initialize new links
+		mb_links = defaultdict(lambda: {
+			'source': None, 'target': None, 'value': 0
+			})
+		# Reorganize links
+		for link in self.links:
+			source = self.nodes[link['ship_compony_id']]['industry_lv3']
+			target = self.nodes[link['deliver_company_id']]['industry_lv3']
+			key = '%s %s' % (source, target)
+			mb_links[key]['source'] = source
+			mb_links[key]['target'] = target
+			mb_links[key]['value']  += 1
+		# Update links
+		self.links = list(mb_links.values())
+		# Initialize and define new nodes structure
+		mb_nodes = defaultdict(lambda: {
+			'industry_lv1': defaultdict(lambda: 0),
+			'industry_lv2': defaultdict(lambda: 0),
+			'industry_lv3': defaultdict(lambda: 0), # Primary key
+			'coop_months_dist': defaultdict(lambda: 0),
+			'city_dist': defaultdict(lambda: 0),
+			'company_num': 0, 'oversea_num': 0
+			})
+		# Reorganize nodes
+		for company_id, company_info in self.nodes.items():
+			mb_nodes[company_info['industry_lv3']]['industry_lv1'] = company_info['industry_lv1']
+			mb_nodes[company_info['industry_lv3']]['industry_lv2'] = company_info['industry_lv2']
+			mb_nodes[company_info['industry_lv3']]['industry_lv3'] = company_info['industry_lv3']
+			mb_nodes[company_info['industry_lv3']]['company_num'] += 1
+			mb_nodes[company_info['industry_lv3']]['oversea_num'] += 1 \
+				if company_info['oversea'] else 0
+			mb_nodes[company_info['industry_lv3']]['coop_months_dist'][company_info['coop_months']] += 1
+			mb_nodes[company_info['industry_lv3']]['city_dist'][company_info['area_city']['city_name']] += 1
+		# Update nodes
+		self.nodes = mb_nodes
 
 
 if __name__ == '__main__':
@@ -291,10 +342,16 @@ if __name__ == '__main__':
 	# g = SfExpressGraph()
 	# g.load('/Users/woodie/Desktop/sfexpress/basic_graph')
 	# print('Numbers of nodes %d, number of links %d.' % g.shape())
+	# g.preview()
 
-	g = MapBasedGraph()
-	g.build('/Users/woodie/Desktop/sfexpress/basic_graph')
+	# g = MapBasedGraph()
+	# g.load('/Users/woodie/Desktop/sfexpress/basic_graph')
+	# print('Numbers of nodes %d, number of links %d.' % g.shape())
+	# g.save('/Users/woodie/Desktop/sfexpress/map_based_graph')
+	# g.preview()
+
+	g = ForceDirectedGraph()
+	g.load('/Users/woodie/Desktop/sfexpress/basic_graph')
 	print('Numbers of nodes %d, number of links %d.' % g.shape())
-	g.save('/Users/woodie/Desktop/sfexpress/map_based_graph')
+	g.save('/Users/woodie/Desktop/sfexpress/force_directed_graph')
 	g.preview()
-

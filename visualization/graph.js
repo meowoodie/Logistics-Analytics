@@ -45,8 +45,8 @@ var colorBar = _.map(new Array(12), function(){return dynamicColors();})
 var d3Graph = {
     // 
     forceDirected: function(dom, graph) {
-        var width  = 800,
-            height = 800;
+        var width  = 1200,
+            height = 1000;
         
         // Read group info from raw graph data
         var groupInfo = {};
@@ -78,9 +78,9 @@ var d3Graph = {
                 .range([d3.rgb("#FFF500"), d3.rgb("#007AFF")]);
         
         var force = d3.layout.force()
-                .charge(-120)
+                .charge(-500)
                 .gravity(0.2)
-                .linkDistance(50)
+                .linkDistance(130)
                 .size([width, height]);
         
         var svg = d3.select("#" + dom).append("svg")
@@ -96,7 +96,7 @@ var d3Graph = {
                 .data(graph.links)
                 .enter().append("line")
                 .attr("class", "link")
-                .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+                .style("stroke-width", function(d) { return Math.sqrt(d.value) * 5; });
                 
         var crosslink = svg.selectAll(".cross-link")
                 .data(crossLinks)
@@ -106,10 +106,10 @@ var d3Graph = {
                 .attr("x2", 200)
                 .attr("y2", 200)
                 .attr("class", "cross-link")
-                .style("stroke-width", function(d) { return Math.sqrt(d.value * 10); })
-                .style("stroke", function(d){
-                      return link_color(d.value * length);
-                      });
+                .style("stroke-width", function(d) { return Math.sqrt(d.value) * 5; })
+                // .style("stroke", function(d){
+                //       return link_color(d.value * length);
+                //       });
 
         var node = svg.selectAll(".node")
                 .data(graph.nodes)
@@ -130,7 +130,7 @@ var d3Graph = {
                 .attr("x", 12)
                 .attr("dy", ".35em")
                 .style("font-size", "14px")
-                .text(function(d) { return d.city_name; });
+                .text(function(d) { return d.industry_lv3; });
 
         force.on("tick", function() {
             crosslink.attr("x1", function(d) { return nodeMap[d.source].x; })
