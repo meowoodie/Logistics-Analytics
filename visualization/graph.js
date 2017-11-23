@@ -119,7 +119,8 @@ var d3Graph = {
         var nodeMap = {};
         node.append("circle")
                 .attr("class", "node")
-                .attr("r", 5)
+                // .attr("r", 5)
+                .attr("r", function(d)  { return d.company_num/1000 > 15 ? 15 : (d.company_num/1000 < 5 ? 5 : d.company_num / 1000);})
                 .style("fill", function(d) {
                     nodeMap[d.index] = d;
                     return color(d.group);
