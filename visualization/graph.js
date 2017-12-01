@@ -1,63 +1,25 @@
 /*
  * Customized d3 graph
  * 
- * 1. Force directed: 
- * 2. Map based: 
+ * 1. Force directed
+ * 2. Map based
  */
 
-// var WIDTH = 800, HEIGHT = 800;
-
-var locateEmptyCities = function (graph){
-    // console.log(graph.nodes);
-    _.map(graph.nodes, function(node){
-        if (node.area_code == "024Y"){
-            node.lat = 41.8057;
-            node.lng = 123.4315;
-        }
-        else if (node.area_code == "028Y"){
-            node.lat = 30.5728;
-            node.lng = 104.0668;
-        }
-        else if (node.area_code == "029Y"){
-            node.lat = 34.3416;
-            node.lng = 108.9398;
-        }
-        else if (node.area_code == "760Y"){
-            node.lat = 22.31;
-            node.lng = 113.23;
-        }
-        else if (node.area_code == "575Y"){
-            node.lat = 29.9958;
-            node.lng = 120.5861;
-        }
-    });
-};
-
-var dynamicColors = function() {
-    var r = Math.floor(Math.random() * 255);
-    var g = Math.floor(Math.random() * 255);
-    var b = Math.floor(Math.random() * 255);
-    return "rgb(" + r + "," + g + "," + b + ")";
-}
-
-var colorBar = _.map(new Array(12), function(){return dynamicColors();})
-
 var d3Graph = {
-    // 
-    forceDirected: function(dom, graph) {
+
+    forceDirected: function(domId, graph) {
         var width  = 1200,
             height = 1000;
-        
-        // Read group info from raw graph data
-        var groupInfo = {};
-        var index = 0;
 
-
+        // Collect the group tag of each of the nodes
+        var groupInfo = {},
+            index = 0;
         graph.nodes.forEach(function(d) {
             groupInfo[index] = d.group;
             index ++;
         });
         
+        // Collect cross links and normal links
         var newLinks   = [],
             crossLinks = [];
         graph.links.forEach(function(d) {
@@ -67,23 +29,19 @@ var d3Graph = {
                 crossLinks.push(d);
             }
         });
-
         graph.links = newLinks;
 
+        // Colorbar for showing different industrial catagories
         var color = d3.scale.category20();
-
-        var length = 1000,
-            link_color = d3.scale.linear().domain([1,length])
-                .interpolate(d3.interpolateHcl)
-                .range([d3.rgb("#FFF500"), d3.rgb("#007AFF")]);
         
+        // Init force
         var force = d3.layout.force()
                 .charge(-500)
                 .gravity(0.2)
                 .linkDistance(130)
                 .size([width, height]);
         
-        var svg = d3.select("#" + dom).append("svg")
+        var svg = d3.select("#" + domId).append("svg")
                 .attr("width", width)
                 .attr("height", height);
             
@@ -107,9 +65,6 @@ var d3Graph = {
                 .attr("y2", 200)
                 .attr("class", "cross-link")
                 .style("stroke-width", function(d) { return Math.sqrt(d.value) * 5; })
-                // .style("stroke", function(d){
-                //       return link_color(d.value * length);
-                //       });
 
         var node = svg.selectAll(".node")
                 .data(graph.nodes)
@@ -150,10 +105,9 @@ var d3Graph = {
         });
     },
 
+    mapBased: function(domId, graph) {
 
-    // 
-    mapBased: function(dom, graph) {
-
+        // Functions that supports zooming the canvas
         function dottype(d) {
             d.x = +d.x;
             d.y = +d.y;
@@ -176,7 +130,8 @@ var d3Graph = {
         function dragended(d) {
             d3.select(this).classed("dragging", false);
         }
- 
+        
+        // Init map and zoom widgets
         var map = d3.map(),
             zoom = d3.behavior.zoom()
                 .scaleExtent([1, 10])
@@ -185,15 +140,22 @@ var d3Graph = {
                 .origin(function(d) { return d; })
                 .on("dragstart", dragstarted)
                 .on("drag", dragged)
-                .on("dragend", dragended);
-            color = d3.scale.category20();
+                .on("dragend", dragended),
+            colorbarDict = _.chain(graph.nodes)
+                .values()
+                .map(function(node_val){return _.keys(node_val.industry_lv1_dist);})
+                .flatten()
+                .uniq()
+                .map(function(industry_name){return [industry_name, dynamicColors()]})
+                .object()
+                .value();
          
         var width = 1200, height = 1000;
         
         var proj = d3.geo.mercator().center([105, 38]).scale(1000).translate([width/2, height/2]),
             path = d3.geo.path().projection(proj);
          
-        var svg = d3.select("#" + dom).append("svg")
+        var svg = d3.select("#" + domId).append("svg")
             .attr("width", width)
             .attr("height", height)
             .call(zoom);
@@ -266,16 +228,11 @@ var d3Graph = {
             .enter().append("circle")
             .attr("transform", function(d) { return "translate(" + proj([d.lng, d.lat]) + ")"; })
             .attr("r", function(d)  { return d.company_num/2000 > 8 ? 8 : (d.company_num/2000 < 1 ? 1 : d.company_num / 2000);})
-            // .attr("id", function(d) { return "node-" + d.area_code; })
             .style("fill", "Green")
-            // .style("fill", function(d) {
-            //      return color(d.company_num/10000);
-            // })
             .on("mouseover", function(d) {
                 d3.select(this)
                     .transition()
                     .duration(500)
-                    // .attr("x", function(d) { return d.x; }) //The bar moves to the left a bit
                     .style("cursor", "pointer")
                     .attr("r", 20) // The bar becomes larger
                     .style("fill", "Red");
@@ -285,7 +242,10 @@ var d3Graph = {
                 var industData = {
                     datasets: [{
                         data: _.values(d.industry_lv1_dist),
-                        backgroundColor: colorBar
+                        backgroundColor: _.chain(d.industry_lv1_dist) // colorBar
+                            .keys()
+                            .map(function(industry_name){return colorbarDict[industry_name];})
+                            .value() 
                     }],
                     labels: _.keys(d.industry_lv1_dist)
                 };

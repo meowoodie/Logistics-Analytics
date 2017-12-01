@@ -31,6 +31,7 @@
 
 <!-- JS dependencies -->
 <script src="graph.js"></script>
+<script src="utils.js"></script>
 
 <!-- Hardcode dataset (in avoid of hosting a http server) -->
 <script src="data/city_nodes.js"></script>
@@ -66,7 +67,7 @@
 	// var graph2 = JSON.parse(JSON.stringify( graph1 )); // deep copy
 	// d3Graph.forceDirected("force-svg", graph1);
 
-	locateEmptyCities(graph1);
+	hardcodeMissingGeo(graph1);
 	d3Graph.mapBased("map-svg", graph1);
 
 	var INDUST_MIN_VALUE = 0,
@@ -86,7 +87,7 @@
 		_industry_links = _.map(industry_links, function(link){
 			link.source = _.indexOf(industs_lv3, link.source); 
 			link.target = _.indexOf(industs_lv3, link.target); 
-			link.value = link.value > INDUST_MIN_VALUE ? (link.value - INDUST_MIN_VALUE) / INDUST_MAX_VALUE : 0; 
+			link.value  = link.value > INDUST_MIN_VALUE ? (link.value - INDUST_MIN_VALUE) / INDUST_MAX_VALUE : 0; 
 			return link; });
 
 		console.log(_industry_nodes.slice(1,5));

@@ -338,11 +338,12 @@ if __name__ == '__main__':
 
 	# g = SfExpressGraph(iterobj=sys.stdin)
 	# g.save('/Users/woodie/Desktop/sfexpress/basic_graph')
-
-	# g = SfExpressGraph()
-	# g.load('/Users/woodie/Desktop/sfexpress/basic_graph')
-	# print('Numbers of nodes %d, number of links %d.' % g.shape())
 	# g.preview()
+
+	g = SfExpressGraph()
+	g.load('/Users/woodie/Desktop/sfexpress/basic_graph')
+	print('Numbers of nodes %d, number of links %d.' % g.shape())
+	g.preview()
 
 	# g = MapBasedGraph()
 	# g.load('/Users/woodie/Desktop/sfexpress/basic_graph')
@@ -350,8 +351,8 @@ if __name__ == '__main__':
 	# g.save('/Users/woodie/Desktop/sfexpress/map_based_graph')
 	# g.preview()
 
-	g = ForceDirectedGraph()
-	g.load('/Users/woodie/Desktop/sfexpress/basic_graph')
-	print('Numbers of nodes %d, number of links %d.' % g.shape())
-	g.save('/Users/woodie/Desktop/sfexpress/force_directed_graph')
-	g.preview()
+	# g = ForceDirectedGraph()
+	# g.load('/Users/woodie/Desktop/sfexpress/basic_graph')
+	# print('Numbers of nodes %d, number of links %d.' % g.shape())
+	# g.save('/Users/woodie/Desktop/sfexpress/force_directed_graph')
+	# g.preview()
