@@ -93,29 +93,63 @@ class SfExpressGraph(Graph):
 			link["deliver_time"] = None if link["deliver_time"] == "NULL" \
 				else arrow.get(link["deliver_time"], "YYYY-MM-DD HH:mm:ss").timestamp
 
-	def send_rec_ratio_dist(self):
-		"""
-		Send Receive Ratio Distribution
+	# def send_rec_ratio_dist(self):
+	# 	"""
+	# 	Send Receive Ratio Distribution
 
-		It would return the distribution of send & receive ratio over all the nodes
-		(companies). The ratio is calculated by quantity of sending and receiving of 
-		one node.  
+	# 	It would return the distribution of send & receive ratio over all the nodes
+	# 	(companies). The ratio is firstly calculated by quantity of sending and receiving  
+	# 	of one node. Afterwards, compute the histogram of the ratio with a specific bins
+	# 	(log ratio)
+	# 	"""
+	# 	send_rec_stat = defaultdict(lambda: {"send": 0, "rec": 0})
+	# 	for link in self.links:
+	# 		send_rec_stat[link["ship_compony_id"]]["send"] += 1
+	# 		send_rec_stat[link["deliver_company_id"]]["rec"] += 1
+	# 	# for company_id, stats in send_rec_stat.items():
+	# 	# 	send_rec_stat[company_id]["send_rec_ratio"] = stats["send"] / stats["rec"] \
+	# 	# 		if stats["rec"] != 0 else None
+	# 	ratio_stats = [
+	# 		stats["send"] / stats["rec"]
+	# 		for company_id, stats in send_rec_stat.items() 
+	# 		if stats["rec"] != 0 ]
+	# 	ratio_dist, ratio_bins = np.histogram(ratio_stats, bins=np.linspace())
+	# 	return ratio_dist, ratio_bins
+
+	def conn_ratio_dist(self):
 		"""
-		send_rec_stat = defaultdict(lambda: {
-			"send": 0, "rec": 0
-			})
+		Bidirectional Connectivity Ratio Distribution
+
+		Bidirectional Connectivity means a kind of relationship between two arbitrary 
+		nodes that are connected in both two ways. This function would calculate the 
+		ratio of bidirectional connected link, leaving link and comming link for each of
+		the nodes. And compute the distribution for each of three ratios.  
+		"""
+		conn_infos = defaultdict(lambda: {"bi": [], "out": [], "in": []})
+		conn_stats = defaultdict(lambda: {"only_in": [], "only_out": [], "in": []})
 		for link in self.links:
-			send_rec_stat[link["ship_compony_id"]]["send"] += 1
-			send_rec_stat[link["deliver_company_id"]]["rec"] += 1
-		# for company_id, stats in send_rec_stat.items():
-		# 	send_rec_stat[company_id]["send_rec_ratio"] = stats["send"] / stats["rec"] \
-		# 		if stats["rec"] != 0 else None
-		ratio_stats = [
-			stats["send"] / stats["rec"] 
-			for company_id, stats in send_rec_stat.items() 
-			if stats["rec"] != 0 ]
-		ratio_dist, ratio_bins = np.histogram(ratio_stats, bins=np.linspace())
-		return ratio_dist, ratio_bins
+			
+			if link["deliver_company_id"] in conn_infos[link["ship_compony_id"]]["in"]:
+				conn_infos[link["ship_compony_id"]]["in"].remove(link["deliver_company_id"])
+				conn_infos[link["ship_compony_id"]]["bi"].append(link["deliver_company_id"])
+			else:
+				conn_infos[link["ship_compony_id"]]["out"].append(link["deliver_company_id"])
+
+			if link["ship_compony_id"] in conn_infos[link["deliver_company_id"]]["out"]:
+				conn_infos[link["deliver_company_id"]]["out"].remove(link["ship_compony_id"])
+				conn_infos[link["deliver_company_id"]]["bi"].append(link["ship_compony_id"])
+			else:
+				conn_infos[link["deliver_company_id"]]["in"].append(link["ship_compony_id"])
+
+		for _, stats in conn_infos.items():
+			if len(stats["in"]) > 0 and len(stats["bi"]) == 0 and len(stats["out"]) == 0:
+				conn_stats["only_in"] += 1 # {"bi": len(stats["bi"]), "out": len(stats["out"]), "in": len(stats["in"])}
+			elif len(stats["out"]) > 0 and len(stats["bi"]) == 0 and len(stats["in"]) == 0:
+				conn_stats["only_out"] += 0
+			elif len(stats["bi"]) != 0 
+		for 
+		return conn_stats
+
 
 
 
@@ -238,9 +272,8 @@ if __name__ == "__main__":
 	g.load("/Users/woodie/Desktop/sfexpress/basic_graph")
 	print("Numbers of nodes %d, number of links %d." % g.shape(), file=sys.stderr)
 	# print(json.dumps(g.send_rec_ratio_dist()))
-	dist, bins = g.send_rec_ratio_dist()
-	print(dist)
-	print(bins)
+	dist = g.conn_ratio_dist()
+	pprint(dist)
 	# g.preview()
 
 	# g = MapBasedGraph()
