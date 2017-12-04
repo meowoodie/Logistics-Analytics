@@ -11,6 +11,74 @@
 
 <!-- HTML dom -->
 
+<!-- Grid -->
+<section class="grid-demo">
+
+      <h2 class="section-title"><span>Grid Demo</span></h2>
+      
+      <div class="controls cf">
+        <div class="control search">
+          <div class="control-icon">
+            <i class="material-icons">&#xE8B6;</i>
+          </div>
+          <input class="control-field search-field form-control " type="text" name="search" placeholder="Search..." />
+        </div>
+        <div class="control filter">
+          <div class="control-icon">
+            <i class="material-icons">&#xE152;</i>
+          </div>
+          <div class="select-arrow">
+            <i class="material-icons">&#xE313;</i>
+          </div>
+          <select class="control-field filter-field form-control">
+            <option value="" selected>All</option>
+            <option value="red">Red</option>
+            <option value="blue">Blue</option>
+            <option value="green">Green</option>
+          </select>
+        </div>
+        <div class="control sort">
+          <div class="control-icon">
+            <i class="material-icons">&#xE164;</i>
+          </div>
+          <div class="select-arrow">
+            <i class="material-icons">&#xE313;</i>
+          </div>
+          <select class="control-field sort-field form-control">
+            <option value="order" selected>Drag</option>
+            <option value="title">Title (drag disabled)</option>
+            <option value="color">Color (drag disabled)</option>
+          </select>
+        </div>
+        <div class="control layout">
+          <div class="control-icon">
+            <i class="material-icons">&#xE871;</i>
+          </div>
+          <div class="select-arrow">
+            <i class="material-icons">&#xE313;</i>
+          </div>
+          <select class="control-field layout-field form-control">
+            <option value="left-top" selected>Left Top</option>
+            <option value="left-top-fillgaps">Left Top (fill gaps)</option>
+            <option value="right-top">Right Top</option>
+            <option value="right-top-fillgaps">Right Top (fill gaps)</option>
+            <option value="left-bottom">Left Bottom</option>
+            <option value="left-bottom-fillgaps">Left Bottom (fill gaps)</option>
+            <option value="right-bottom">Right Bottom</option>
+            <option value="right-bottom-fillgaps">Right Bottom (fill gaps)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid"></div>
+
+      <div class="grid-footer">
+        <button class="add-more-items btn btn-primary"><i class="material-icons">&#xE145;</i>Add more items</button>
+      </div>
+
+</section>
+<!-- Charts & Graph -->
+<!-- <div id="conn-ratio-dist-chart"></div> -->
 <div id="map-svg"></div>
 <div id="force-svg"></div>
 
@@ -24,20 +92,28 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.5/nv.d3.min.js"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script src="https://d3js.org/topojson.v1.min.js"></script>
-<!-- Chart.js-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js"></script>>
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.3.1/web-animations.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/muuri/0.5.1/muuri.min.js"></script>
+
 <!-- Customized css -->
 <link rel="stylesheet" type="text/css" href="graph.css" media="screen" />
-
-<!-- JS dependencies -->
+<link rel="stylesheet" type="text/css" href="grid.css" />
+<!-- Customized JS -->
+<script src="grid.js"></script>
 <script src="graph.js"></script>
 <script src="utils.js"></script>
+<script src="stats.js"></script>
 
 <!-- Hardcode dataset (in avoid of hosting a http server) -->
 <script src="data/city_nodes.js"></script>
 <script src="data/city_links.js"></script>
 <script src="data/industry_nodes.js"></script>
 <script src="data/industry_links.js"></script>
+<script src="data/conn_ratio_dist.js"></script>
 <script src="data/china_cities.js"></script>
 <script src="data/china_provinces.js"></script>
 
@@ -59,6 +135,10 @@
 				link.value = link.value > CITY_MIN_VALUE ? (link.value - CITY_MIN_VALUE) / CITY_MAX_VALUE : 0;
 				return link; });
 
+	// Preview processed nodes and links
+	console.log(_city_nodes.slice(1,5));
+	console.log(_city_links.slice(1,5));
+
 	var graph1 = {
 		"nodes": _city_nodes,
 		"links": _city_links
@@ -73,25 +153,31 @@
 	var INDUST_MIN_VALUE = 0,
 		INDUST_MAX_VALUE = _.max(industry_links, function(link){ return link.value }).value;
 
+		// Set of categories of industry lv3
 	var industs_lv3 = _.keys(industry_nodes),
+		// Set of categories of industry lv1
 		industs_lv1 = _.chain(industry_nodes)
 			.map(function(node){return node['industry_lv1']})
 			.uniq()
 			.value(),
+		// Add new attribute "group" for each of the nodes 
+		// in order to group nodes that have same category of industry lv1.
 		_industry_nodes = _.chain(industry_nodes)
 			.values()
 			.map(function(node){
 				node.group = _.indexOf(industs_lv1, node.industry_lv1); 
 				return node; })
 			.value(),
+		// Normalize link value from 0 to 1
 		_industry_links = _.map(industry_links, function(link){
 			link.source = _.indexOf(industs_lv3, link.source); 
 			link.target = _.indexOf(industs_lv3, link.target); 
 			link.value  = link.value > INDUST_MIN_VALUE ? (link.value - INDUST_MIN_VALUE) / INDUST_MAX_VALUE : 0; 
 			return link; });
 
-		console.log(_industry_nodes.slice(1,5));
-		console.log(_industry_links.slice(1,5));
+	// Preview processed nodes and links
+	console.log(_industry_nodes.slice(1,5));
+	console.log(_industry_links.slice(1,5));
 
 	var graph2 = {
 		"nodes": _industry_nodes,
@@ -100,5 +186,6 @@
 
 	d3Graph.forceDirected("force-svg", graph2);
 
+	// statChart.connRatioDist("conn-ratio-dist-chart", conn_ratio_dist);
 
 </script>
