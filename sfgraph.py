@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+
+"""
+
 import sys
 import json
 import arrow
@@ -22,7 +26,11 @@ class SfExpressGraph(Graph):
 	its own business logic. 
 	"""
 
-	def __init__(self, iterobj=None):
+	def __init__(self, 
+		node_key="company_id", 
+		link_src_key="ship_compony_id", 
+		link_trg_key="deliver_company_id", 
+		iterobj=None):
 		# Definition of nodes
 		company_info_terms = [
 			"company_id", "business", "oversea","industry_lv1", "industry_lv2", \
@@ -32,6 +40,7 @@ class SfExpressGraph(Graph):
 			"transac_id", "ship_time", "deliver_time", "ship_compony_id", "deliver_company_id"]
 		# Initialize graph object
 		Graph.__init__(self, iterobj=iterobj,
+			node_key=node_key, link_src_key=link_src_key, link_trg_key=link_trg_key,
 			node_terms=company_info_terms, link_terms=transac_info_terms)
 
 	def preprocess(self, record):
@@ -93,30 +102,23 @@ class SfExpressGraph(Graph):
 			link["deliver_time"] = None if link["deliver_time"] == "NULL" \
 				else arrow.get(link["deliver_time"], "YYYY-MM-DD HH:mm:ss").timestamp
 
-	# def send_rec_ratio_dist(self):
+	# def sketch(self):
 	# 	"""
-	# 	Send Receive Ratio Distribution
+	# 	Sketch
 
-	# 	It would return the distribution of send & receive ratio over all the nodes
-	# 	(companies). The ratio is firstly calculated by quantity of sending and receiving  
-	# 	of one node. Afterwards, compute the histogram of the ratio with a specific bins
-	# 	(log ratio)
+	# 	Sketch function would return the simplest graph that only contains the basic structure
+	# 	of the graph and limited nodes information.
+
+	# 	First, it would merge all the links between two arbitrary nodes, add new field called 
+	# 	"value" for links which means the number of links that between same source and same 
+	# 	target, and then discard other previously existed information in links.
+
+	# 	Also it would only keep specific fields for nodes, which are indicated by keep_nodes_terms.
 	# 	"""
-	# 	send_rec_stat = defaultdict(lambda: {"send": 0, "rec": 0})
-	# 	for link in self.links:
-	# 		send_rec_stat[link["ship_compony_id"]]["send"] += 1
-	# 		send_rec_stat[link["deliver_company_id"]]["rec"] += 1
-	# 	# for company_id, stats in send_rec_stat.items():
-	# 	# 	send_rec_stat[company_id]["send_rec_ratio"] = stats["send"] / stats["rec"] \
-	# 	# 		if stats["rec"] != 0 else None
-	# 	ratio_stats = [
-	# 		stats["send"] / stats["rec"]
-	# 		for company_id, stats in send_rec_stat.items() 
-	# 		if stats["rec"] != 0 ]
-	# 	ratio_dist, ratio_bins = np.histogram(ratio_stats, bins=np.linspace())
-	# 	return ratio_dist, ratio_bins
+	# 	self.merge_links()
+	# 	self.simplify_nodes([self.node_key, "business", "oversea", "industry_lv3", "area_code"])
 
-	def conn_ratio_dist(self):
+	def conn_ratio_dist(self, bin_num=20):
 		"""
 		Bidirectional Connectivity Ratio Distribution
 
@@ -126,43 +128,52 @@ class SfExpressGraph(Graph):
 		the nodes. And compute the distribution for each of three ratios.  
 		"""
 		conn_infos = defaultdict(lambda: {"bi": [], "out": [], "in": []})
-		conn_stats = defaultdict(lambda: {"only_in": [], "only_out": [], "in": []})
+		conn_stats = []
 		for link in self.links:
-			
-			if link["deliver_company_id"] in conn_infos[link["ship_compony_id"]]["in"]:
-				conn_infos[link["ship_compony_id"]]["in"].remove(link["deliver_company_id"])
-				conn_infos[link["ship_compony_id"]]["bi"].append(link["deliver_company_id"])
+			if link[self.link_trg_key] in conn_infos[link[self.link_src_key]]["in"]:
+				conn_infos[link[self.link_src_key]]["in"].remove(link[self.link_trg_key])
+				conn_infos[link[self.link_src_key]]["bi"].append(link[self.link_trg_key])
 			else:
-				conn_infos[link["ship_compony_id"]]["out"].append(link["deliver_company_id"])
-
-			if link["ship_compony_id"] in conn_infos[link["deliver_company_id"]]["out"]:
-				conn_infos[link["deliver_company_id"]]["out"].remove(link["ship_compony_id"])
-				conn_infos[link["deliver_company_id"]]["bi"].append(link["ship_compony_id"])
+				conn_infos[link[self.link_src_key]]["out"].append(link[self.link_trg_key])
+			if link[self.link_src_key] in conn_infos[link[self.link_trg_key]]["out"]:
+				conn_infos[link[self.link_trg_key]]["out"].remove(link[self.link_src_key])
+				conn_infos[link[self.link_trg_key]]["bi"].append(link[self.link_src_key])
 			else:
-				conn_infos[link["deliver_company_id"]]["in"].append(link["ship_compony_id"])
-
+				conn_infos[link[self.link_trg_key]]["in"].append(link[self.link_src_key])
+		# Statistics of numbers of three types of links for each of nodes
 		for _, stats in conn_infos.items():
-			if len(stats["in"]) > 0 and len(stats["bi"]) == 0 and len(stats["out"]) == 0:
-				conn_stats["only_in"] += 1 # {"bi": len(stats["bi"]), "out": len(stats["out"]), "in": len(stats["in"])}
-			elif len(stats["out"]) > 0 and len(stats["bi"]) == 0 and len(stats["in"]) == 0:
-				conn_stats["only_out"] += 0
-			elif len(stats["bi"]) != 0 
-		for 
-		return conn_stats
+			conn_stats.append([len(stats["in"]), len(stats["out"]), len(stats["bi"])])
+		# Calculate histogram for each type of links
+		np_conn_nums = np.array(conn_stats).transpose()
+		np_conn_hist = np_conn_nums / np_conn_nums.sum(axis=0)
+		np_in_hist, _  = np.histogram(np_conn_hist[0], bins=bin_num)
+		np_out_hist, _ = np.histogram(np_conn_hist[1], bins=bin_num)
+		np_bi_hist, _  = np.histogram(np_conn_hist[2], bins=bin_num)
+
+		return {"in_hist": np_in_hist.tolist(), "out_hist": np_out_hist.tolist(), "bi_hist": np_bi_hist.tolist()}		
 
 
 
-
-class MapBasedGraph(SfExpressGraph):
+# TODO: Rewrite the loading function for two class below, by using nodes merging and links merging
+class CityBasedGraph(SfExpressGraph):
 	"""
+	City Based Graph for SF Express
+
+	This class would help build a graph whose nodes are various of cities and links 
+	are transactions between cities. 
 	"""
 
 	def __init__(self):
 		# Initialize sf-express graph object
 		SfExpressGraph.__init__(self, iterobj=None)
+		# TODO: Redefine node_terms and link_terms
+		# TODO: Redefine node key and link key (src & trg)
 
 	def load(self, path):
 		"""
+		Load an existed SFExpress Graph from json file, and reprocess the graph in 
+		accordance with grouping nodes into cities, and merging links between cities.
+		Then update graph.
 		"""
 		super(SfExpressGraph, self).load(path)
 		# Initialize new links
@@ -171,8 +182,8 @@ class MapBasedGraph(SfExpressGraph):
 			})
 		# Reorganize links
 		for link in self.links:
-			source = self.nodes[link["ship_compony_id"]]["area_city"]["city_name"]
-			target = self.nodes[link["deliver_company_id"]]["area_city"]["city_name"]
+			source = self.nodes[link[self.link_src_key]]["area_city"]["city_name"]
+			target = self.nodes[link[self.link_trg_key]]["area_city"]["city_name"]
 			key = "%s %s" % (source, target)
 			mb_links[key]["source"] = source
 			mb_links[key]["target"] = target
@@ -213,16 +224,25 @@ class MapBasedGraph(SfExpressGraph):
 
 
 
-class ForceDirectedGraph(SfExpressGraph):
+class IndustryBasedGraph(SfExpressGraph):
 	"""
+	Industry Based Graph for SF Express
+
+	This class would help build a graph whose nodes are categories of industries and 
+	links are transactions between two industries.
 	"""
 
 	def __init__(self):
 		# Initialize sf-express graph object
 		SfExpressGraph.__init__(self, iterobj=None)
+		# TODO: Redefine node_terms and link_terms
+		# TODO: Redefine node key and link key (src & trg)
 
 	def load(self, path):
 		"""
+		Load an existed SFExpress Graph from json file, and reprocess the graph in 
+		accordance with grouping nodes into industries, and merging links between industries.
+		Then update graph.
 		"""
 		super(SfExpressGraph, self).load(path)
 		# Initialize new links
@@ -231,8 +251,8 @@ class ForceDirectedGraph(SfExpressGraph):
 			})
 		# Reorganize links
 		for link in self.links:
-			source = self.nodes[link["ship_compony_id"]]["industry_lv3"]
-			target = self.nodes[link["deliver_company_id"]]["industry_lv3"]
+			source = self.nodes[link[self.link_src_key]]["industry_lv3"]
+			target = self.nodes[link[self.link_trg_key]]["industry_lv3"]
 			key = "%s %s" % (source, target)
 			mb_links[key]["source"] = source
 			mb_links[key]["target"] = target
@@ -262,19 +282,44 @@ class ForceDirectedGraph(SfExpressGraph):
 		self.nodes = mb_nodes
 
 
+
 if __name__ == "__main__":
 
 	# g = SfExpressGraph(iterobj=sys.stdin)
 	# g.save("/Users/woodie/Desktop/sfexpress/basic_graph")
 	# g.preview()
 
+	# g = SfExpressGraph()
+	# g.load("/Users/woodie/Desktop/sfexpress/basic_graph")
+	# print("Numbers of nodes %d, number of links %d." % g.shape(), file=sys.stderr)
+	# dist_dict = g.conn_ratio_dist()
+	# print(dist_dict)
+
 	g = SfExpressGraph()
 	g.load("/Users/woodie/Desktop/sfexpress/basic_graph")
 	print("Numbers of nodes %d, number of links %d." % g.shape(), file=sys.stderr)
-	# print(json.dumps(g.send_rec_ratio_dist()))
-	dist = g.conn_ratio_dist()
-	pprint(dist)
-	# g.preview()
+	subgraph = g.get_contacting_subgraph("0000658059", contact_degree=2)
+	pprint(dict(list(subgraph.nodes.items())[0:2]))
+	pprint(subgraph.links[0:5])
+	print(len(subgraph.nodes))
+	print(len(subgraph.links))
+	subgraph.sketch()
+	print("-- sketch! --")
+	pprint(dict(list(subgraph.nodes.items())[0:2]))
+	pprint(subgraph.links[0:5])
+	print(len(subgraph.nodes))
+	print(len(subgraph.links))
+
+	nodes_str = json.dumps(subgraph.nodes)
+	links_str = json.dumps(subgraph.links)
+	with open("nodes.json", "w") as f_nodes, \
+	     open("links.json", "w") as f_links:
+		f_nodes.write(nodes_str)
+		f_links.write(links_str)
+
+	# print("result")
+	# for nodes_set in sub_nodes:
+	# 	print(nodes_set)
 
 	# g = MapBasedGraph()
 	# g.load("/Users/woodie/Desktop/sfexpress/basic_graph")
@@ -287,5 +332,7 @@ if __name__ == "__main__":
 	# print("Numbers of nodes %d, number of links %d." % g.shape())
 	# g.save("/Users/woodie/Desktop/sfexpress/force_directed_graph")
 	# g.preview()
+
+
 
 

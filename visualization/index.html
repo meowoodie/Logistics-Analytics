@@ -8,14 +8,14 @@
 	1. Force directed graph
 	2. Map based graph
 -->
-
+<html>
 <!-- HTML dom -->
 
 <!-- Grid -->
-<section class="grid-demo">
+<!-- <section class="grid-demo">
 
       <h2 class="section-title"><span>Grid Demo</span></h2>
-      
+
       <div class="controls cf">
         <div class="control search">
           <div class="control-icon">
@@ -75,13 +75,18 @@
       <div class="grid-footer">
         <button class="add-more-items btn btn-primary"><i class="material-icons">&#xE145;</i>Add more items</button>
       </div>
-
 </section>
-<!-- Charts & Graph -->
-<!-- <div id="conn-ratio-dist-chart"></div> -->
-<div id="map-svg"></div>
-<div id="force-svg"></div>
+ -->
 
+<!-- Chart -->
+<body>
+	<div id="map-svg"></div>
+	<div id="force-svg"></div>
+	<div id="force-svg-subgraph"></div>
+	<canvas id="conn-ratio-dist-chart"></canvas>
+</body>
+
+</html>
 <!-- JQuery -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <!-- Underscore -->
@@ -93,17 +98,17 @@
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script src="https://d3js.org/topojson.v1.min.js"></script>
 <!-- Chart.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js"></script>
-<!-- Chart.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.3.1/web-animations.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js"></script>
+<!-- Grid -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.3.1/web-animations.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/muuri/0.5.1/muuri.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/muuri/0.5.1/muuri.min.js"></script> -->
 
 <!-- Customized css -->
 <link rel="stylesheet" type="text/css" href="graph.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="grid.css" />
+<link rel="stylesheet" type="text/css" href="graph.css" />
 <!-- Customized JS -->
-<script src="grid.js"></script>
 <script src="graph.js"></script>
 <script src="utils.js"></script>
 <script src="stats.js"></script>
@@ -113,12 +118,15 @@
 <script src="data/city_links.js"></script>
 <script src="data/industry_nodes.js"></script>
 <script src="data/industry_links.js"></script>
+<script src="data/sub_nodes.js"></script>
+<script src="data/sub_links.js"></script>
 <script src="data/conn_ratio_dist.js"></script>
 <script src="data/china_cities.js"></script>
 <script src="data/china_provinces.js"></script>
 
 <!-- Main function -->
 <script type="text/javascript">
+
 	var CITY_MIN_VALUE = 0,
 		CITY_MAX_VALUE = _.max(city_links, function(link){ return link.value }).value;
 
@@ -143,9 +151,6 @@
 		"nodes": _city_nodes,
 		"links": _city_links
 	};
-
-	// var graph2 = JSON.parse(JSON.stringify( graph1 )); // deep copy
-	// d3Graph.forceDirected("force-svg", graph1);
 
 	hardcodeMissingGeo(graph1);
 	d3Graph.mapBased("map-svg", graph1);
@@ -186,6 +191,31 @@
 
 	d3Graph.forceDirected("force-svg", graph2);
 
-	// statChart.connRatioDist("conn-ratio-dist-chart", conn_ratio_dist);
+	var SUBG_MIN_VALUE = 0,
+		SUBG_MAX_VALUE = _.max(sub_links, function(link){ return link.value }).value;
+
+	var node_ids   = _.keys(sub_nodes),
+		_sub_nodes = _.chain(sub_nodes)
+			.values().value()
+		// 	.map(function(node){ node.group = return }),
+		_sub_links = _.map(sub_links, function(link){
+			link.source = _.indexOf(node_ids, link.ship_compony_id);
+			link.target = _.indexOf(node_ids, link.deliver_company_id);
+			link.value  = link.value > SUBG_MIN_VALUE ? (link.value - SUBG_MIN_VALUE) / SUBG_MAX_VALUE : 0;
+			return link; });
+
+	// Preview processed nodes and links
+	console.log(_sub_nodes.slice(1,5));
+	console.log(_sub_links.slice(1,5));
+
+	var graph3 = {
+		"nodes": _sub_nodes,
+		"links": _sub_links
+	}
+
+	d3Graph.forceDirected("force-svg-subgraph", graph3);
+	statChart.connRatioDist("conn-ratio-dist-chart", conn_ratio_dist);
+
+
 
 </script>

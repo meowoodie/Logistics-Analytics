@@ -54,7 +54,8 @@ var d3Graph = {
                 .data(graph.links)
                 .enter().append("line")
                 .attr("class", "link")
-                .style("stroke-width", function(d) { return Math.sqrt(d.value) * 5; });
+                // .style("stroke-width", function(d) { return Math.sqrt(d.value) * 5; });
+                .style("stroke-width", function(d) { return d.value * 200; })
                 
         var crosslink = svg.selectAll(".cross-link")
                 .data(crossLinks)
@@ -64,7 +65,8 @@ var d3Graph = {
                 .attr("x2", 200)
                 .attr("y2", 200)
                 .attr("class", "cross-link")
-                .style("stroke-width", function(d) { return Math.sqrt(d.value) * 5; })
+                // .style("stroke-width", function(d) { return Math.sqrt(d.value) * 5; })
+                .style("stroke-width", function(d) { return d.value * 200; })
 
         var node = svg.selectAll(".node")
                 .data(graph.nodes)
@@ -74,19 +76,19 @@ var d3Graph = {
         var nodeMap = {};
         node.append("circle")
                 .attr("class", "node")
-                // .attr("r", 5)
-                .attr("r", function(d)  { return d.company_num/1000 > 15 ? 15 : (d.company_num/1000 < 5 ? 5 : d.company_num / 1000);})
+                // .attr("r", function(d)  { return d.company_num/1000 > 15 ? 15 : (d.company_num/1000 < 5 ? 5 : d.company_num / 1000);})
+                .attr("r", function(d)  { return d.company_id == "0000658059" ? 10 : 5;})
                 .style("fill", function(d) {
                     nodeMap[d.index] = d;
                     return color(d.group);
                 });
 
-        node.append("text")
-                .attr("class", "force-text")
-                .attr("x", 12)
-                .attr("dy", ".35em")
-                .style("font-size", "14px")
-                .text(function(d) { return d.industry_lv3; });
+        // node.append("text")
+        //         .attr("class", "force-text")
+        //         .attr("x", 12)
+        //         .attr("dy", ".35em")
+        //         .style("font-size", "14px")
+        //         .text(function(d) { return d.industry_lv3; });
 
         force.on("tick", function() {
             crosslink.attr("x1", function(d) { return nodeMap[d.source].x; })

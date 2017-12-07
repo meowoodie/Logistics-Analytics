@@ -39,3 +39,24 @@ var hardcodeMissingGeo = function (graph){
 		}
     });
 };
+
+// Formatted String
+// It's a utility for getting formatted string. 
+// e.g. String.format("{0}:{1}:{2} {3}:{4}:{5}", year, month, day, hour, min, sec);
+String.format = function() {
+    // The string containing the format items (e.g. "{0}")
+    // will and always has to be the first argument.
+    var theString = arguments[0];
+    // start with the second argument (i = 1)
+    for (var i = 1; i < arguments.length; i++) {
+        // "gm" = RegEx options for Global search (more than one instance)
+        // and for Multiline search
+        var regEx = new RegExp("\\{" + (i - 1) + "\\}", "gm");
+        theString = theString.replace(regEx, arguments[i]);
+    }
+    return theString;
+};
+
+
+    // var graph2 = JSON.parse(JSON.stringify( graph1 )); // deep copy
+    // d3Graph.forceDirected("force-svg", graph1);

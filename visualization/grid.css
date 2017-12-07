@@ -50,8 +50,8 @@
 }
 .item {
   position: absolute;
-  width: 100px;
-  height: 100px;
+  width: 940px;
+  height: 1000px;
   line-height: 100px;
   margin: 10px;
   z-index: 1;
