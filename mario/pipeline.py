@@ -84,20 +84,19 @@ def main():
 	head_ids_df = _node_ids_df.subtract(_delivered_nodes_df)
 	down_ids_df = _node_ids_df.subtract(_shipped_nodes_df)
 	
-	print(head_ids_df.collect())
 	heads_df = nodes_df \
-		.filter(col("id") in head_ids_df.collect()) \
+		.cogroup(head_ids_df) \
+		.filter(lambda x: x[])
 		.show()
-	exit(0)
+
+	return 
+
 	downs_df = nodes_df \
 		.filter(col("id") in down_ids_df.collect()) \
 		.show()
-	
 
 	# Pipeline 4
 	
-
-if __name__ == "__main__":
 
 	# # Parse the input parameters
 	# 	parser = argparse.ArgumentParser(description="Specify the indices information for link record")
@@ -111,4 +110,4 @@ if __name__ == "__main__":
 	# 	src_info_inds = [ int(ind) for ind in args.src_info_inds.strip().split(",") ]
 	# 	trg_info_inds = [ int(ind) for ind in args.trg_info_inds.strip().split(",") ]
 
-	main()
+main()
