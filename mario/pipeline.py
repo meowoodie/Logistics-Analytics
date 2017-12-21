@@ -3,7 +3,8 @@
 
 from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
-from pyspark.sql.types import *
+from pyspark.sql.functions import col
+# from pyspark.sql.types import *
 
 """
 The script 
@@ -73,13 +74,28 @@ def main():
 		
 	_shipped_nodes_df   = links_df \
 		.select(["src_id"]) \
+		.withColumnRenamed("src_id", "id") \
 		.distinct()
 	_delivered_nodes_df = links_df \
 		.select(["trg_id"]) \
+		.withColumnRenamed("src_id", "id") \
 		.distinct()
 
-	heads_df = _node_ids_df.subtract(_delivered_nodes_df)
-	downs_df = _node_ids_df.subtract(_shipped_nodes_df)
+	head_ids_df = _node_ids_df.subtract(_delivered_nodes_df)
+	down_ids_df = _node_ids_df.subtract(_shipped_nodes_df)
+	
+	print(head_ids_df.collect())
+	heads_df = nodes_df \
+		.filter(col("id") in head_ids_df.collect()) \
+		.show()
+	exit(0)
+	downs_df = nodes_df \
+		.filter(col("id") in down_ids_df.collect()) \
+		.show()
+	
+
+	# Pipeline 4
+	
 
 if __name__ == "__main__":
 
