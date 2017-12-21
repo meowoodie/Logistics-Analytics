@@ -2,18 +2,30 @@ from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
 from pyspark.sql.types import *
 
+# # Parse the input parameters
+# 	parser = argparse.ArgumentParser(description="Specify the indices information for link record")
+# 	parser.add_argument("-s", "--src_id_ind", required=True, type=int, help="The query id")
+# 	parser.add_argument("-t", "--trg_id_ind", required=True, type=int, help="Return the top n results")
+# 	parser.add_argument("-S", "--src_info_inds", required=True, help="Return the results that have the similarities above the threshold")
+# 	parser.add_argument("-T", "--trg_info_inds", required=True, help="The path of the configuration file")
+# 	args = parser.parse_args()
+# 	src_id_ind = args.src_id_ind
+# 	trg_id_ind = args.trg_id_ind
+# 	src_info_inds = [ int(ind) for ind in args.src_info_inds.strip().split(",") ]
+# 	trg_info_inds = [ int(ind) for ind in args.trg_info_inds.strip().split(",") ]
+
 import arrow
 
-app_name  = "Pipeline for Logistics"
-file_name = "/home/woodie/sfexpress_rawdata_first2500k.txt"
+app_name   = "Pipeline for Logistics"
+file_name  = "/home/woodie/sfexpress_rawdata_first2500k.txt"
 nodes_path = "/home/woodie/nodes.csv"
 links_path = "/home/woodie/links.csv"
 
 node_info_fields   = ["id", "main_business", "oversea", "industry_lv1", "industry_lv2", "industry_lv3", "area_code", "area_desc", "area_city", "coop_month"]
 transc_info_fields = ["transc_id", "ship_timestamp", "deliver_timestamp"]
 item_info_fields   = ["item_info"]
-src_node_fields = [ "src_" + field for field in node_info_fields ]
-trg_node_fields = [ "trg_" + field for field in node_info_fields ]
+src_node_fields    = [ "src_" + field for field in node_info_fields ]
+trg_node_fields    = [ "trg_" + field for field in node_info_fields ]
 
 # Init Spark Context as running in local mode
 sc     = SparkContext("local")
