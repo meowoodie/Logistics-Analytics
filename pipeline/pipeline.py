@@ -15,9 +15,9 @@ def main():
 	"""
 
 	app_name   = "Pipeline for Logistics"
-	file_name  = "/home/woodie/sfexpress_rawdata_first2500k.txt"
-	nodes_path = "/home/woodie/nodes.csv"
-	links_path = "/home/woodie/links.csv"
+	file_name  = "/Users/woodie/Downloads/sfexpress_rawdata_first2500k.txt"
+	# nodes_path = "/home/woodie/nodes.csv"
+	# links_path = "/home/woodie/links.csv"
 
 	node_info_fields   = ["id", "main_business", "oversea", "industry_lv1", "industry_lv2", "industry_lv3", "area_code", "area_desc", "area_city", "coop_month"]
 	transc_info_fields = ["transc_id", "ship_timestamp", "deliver_timestamp"]
@@ -71,7 +71,7 @@ def main():
 	# Pipeline 3
 	# Calculate all headstreams & downstreams nodes
 	_node_ids_df = nodes_df.select(["id"])
-		
+
 	_shipped_nodes_df   = links_df \
 		.select(["src_id"]) \
 		.withColumnRenamed("src_id", "id") \
@@ -83,11 +83,12 @@ def main():
 
 	head_ids_df = _node_ids_df.subtract(_delivered_nodes_df)
 	down_ids_df = _node_ids_df.subtract(_shipped_nodes_df)
+
 	
-	heads_df = nodes_df \
-		.cogroup(head_ids_df) \
-		.filter(lambda x: x[])
-		.show()
+	# heads_df = nodes_df \
+	# 	.cogroup(head_ids_df) \
+	# 	.filter(lambda x: x[])
+	# 	.show()
 
 	return 
 
