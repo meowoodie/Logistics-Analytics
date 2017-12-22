@@ -1,7 +1,7 @@
 Sparkling Warehouse
 ===
 
-Sparkling Warehouse is a set of scripts that builds complex pipelines of batch jobs for analysing logistics raw data by using [Spark](https://spark.apache.org/docs/0.9.0/index.html). It handles data preprocessing (`pipeline`), data modeling/instantiation (`nozzle`), workflow management (`valve`), visualization (`tank`), and much more. 
+Sparkling Warehouse is a set of scripts that builds complex workflow of batch jobs for analysing logistics raw data by using [Spark](https://spark.apache.org/docs/0.9.0/index.html). It handles data preprocessing (`pipeline`), data modeling/instantiation (`nozzle`), workflow management (`valve`), visualization (`tank`), and much more. 
 
 Background
 ---
@@ -14,6 +14,6 @@ Ideally, you can assemble pretty much any `pipelines` of tasks you want and mana
 
 Change Log
 ---
-***Dec 21, 2017*** Calculating specific computation task by running script directly.  
+***Dec 21, 2017*** Bulid first pipeline for testing workflow which was newly refactored on Spark.
 
 
