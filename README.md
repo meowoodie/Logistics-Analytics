@@ -10,7 +10,7 @@ The purpose of the Warehouse is to address an unwieldy memory issue typically as
 
 Basically, I rewrote all the feature service logic for the Warehouse that requires high frequency R&W manipulations on the large raw dataset by [PySpark](https://spark.apache.org/docs/0.9.0/python-programming-guide.html). Clearly, by deploying computation on Spark, the Warehouse makes the workflow easy to design without concern about insufficient memory, and it also greatly improves computational performance.
 
-Ideally, you can assemble pretty much any `pipelines` of tasks you want and manage them by `valves`, but mario still comes with some one-button pipeline templates that you can use. It includes support for running ... 
+Ideally, you can assemble pretty much any `pipelines` of tasks you want and manage them by `valves`, but the warehouse still comes with some one-button pipeline templates that you can use. It includes support for running ... 
 
 Change Log
 ---
