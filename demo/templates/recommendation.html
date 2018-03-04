@@ -43,13 +43,13 @@
 			</div>
 	    	<div class="sidebar-wrapper">
 				<ul class="nav">
-					<li class = "nav-item">
+					<!-- <li class = "nav-item">
 						<div class="row">
     					<div class="col-lg-10 col-lg-offset-1">
 								<input id="target_id_input" type = "text" class = "form-control" placeholder="Company Id">
     					</div>
 						</div>
-					</li>
+					</li> -->
 					<li class="active">
 	                    <a href="maps.html">
 	                        <i class="material-icons">find_in_page</i>
@@ -89,6 +89,10 @@
 										<label class="checkbox-inline"><input id="Up_checkbox" type="checkbox" value="Up" onclick = "DU_checkbox_click()">Up Stream</label>
 									</div>
 									<form>
+										<div class="form-group label-floating">
+											<label class = "control-label">Company ID</label>
+											<input type="text" class="form-control" id="CompanyID">
+										</div>
 										<div class="form-group label-floating">
 											<label class = "control-label">Number of Recommendation</label>
 											<input type="text" class="form-control" id="ReNum">
@@ -176,203 +180,55 @@
 
 		// Onclick event for search Id button
 		computeBtn.onclick = function () {
-			var downStream = document.getElementById("Down_checkbox"),
+			var CompanyID = document.getElementById("CompanyID"),
+					downStream = document.getElementById("Down_checkbox"),
 			    upStream = document.getElementById("Up_checkbox"),
 					Rec_n = document.getElementById("ReNum"),
 					Rec_Area = document.getElementById("ReArea");
 
-
-			//Invoke a hint
-			if(crimeId == "" || limit == ""){
-				alert("Caution! \nBoth Crime ID and Limit Number must be filled! ");
-			}
-
-
 			var para = {
-				downStream: downStream.checked, //getTime() returns number of milliseconds
-				upStream: upStream.checked,		//So divided by 1000 to change to the number of seconds
-				Rec_num: Rec_n.value,
-				Area: Rec_Area.value
+				companyId:	CompanyID.value,
+				downStream: downStream.checked?1:0, //getTime() returns number of milliseconds
+				upStream: upStream.checked?1:0,		//So divided by 1000 to change to the number of seconds
+				recNum: Rec_n.value,
+				areas: Rec_Area.value
 			};
-
-			requestBackEnd(para, "/searchCrimeId").then(function (simPoints) {
-				// Remove the current result on the map
-				if (queryMarkers != null) {
-					maps.clearMarkers(queryMarkers);
-					queryMarkers = null;
+			console.log(para);
+			requestBackEnd(para,"/similarCompanies").then(function(Rec_info){
+				console.log(Rec_info);
+				var downStream = document.getElementById("Down_checkbox"),
+						upStream = document.getElementById("Up_checkbox");
+				if (downStream.checked == true){
+					weight = _.map(Rec_info['downs'], function(info, companyID){
+						return(info['score'])
+					});
+					weight_max = _.max(weight);
+					weight_min = _.min(weight);
+					var colorPoints =  _.map(Rec_info['downs'], function(info, companyID){
+						return{
+							position: {'lat': info['lat'], 'lng': info['lng']},
+							color: colorbar(005),
+							weight: 0,
+							id: companyID,
+							mb: info['main_business'],
+							os: info['is_oversea'],
+							score: info['score'],
+							weight: (info['score'] - weight_min)/(weight_max - weight_min),
+							ind1: info['indust_lv1'],
+							ind2: info['indust_lv2'],
+							ind3: info['indust_lv3'],
+							city: info['city'],
+							coop_m: info['coop_month']
+						}
+					});
+					console.log(colorPoints);
+					queryMarkers = maps.createRecommendedMarkers(colorPoints,[]);
 				}
-				// Remove the current lines on the map
-				if (queryLines   != null) {
-							maps.clearLines(queryLines);
-							queryLines   = null;
-				}
 
-				// Prepare the points which be painted on the map
-				var colorPoints = _.map(simPoints, function (point) {
-					return {
-						position: point["position"],
-						color:  colorbar(005), //change color to blue//colorbar(Math.ceil((1-point["similarity"])*colorbarLength)),
-						weight: point["similarity"] * 20,
-						// For info window
-						id: point["id"],
-						label: point["label"],
-						text: point["text"],
-						date: point["date"],
-						priority: point["priority"]
-					}
-				});
-				// Place the marker on the map
-				queryMarkers = maps.createSimilarMarkers(colorPoints,[]);
 			}, function (msg) {
 				alert(msg);
 			});
 		};
-		// Onclick event for search keywords button
-		searchWordsBtn.onclick = function () {
-			var keywords  = document.getElementById("key_words_input").value,
-				limit     = document.getElementById("sw_limit_input").value;
-				//fromYear  = document.getElementById("sw_from_year_input").value,
-				//fromMonth = document.getElementById("sw_from_month_input").value,
-				//fromDay   = document.getElementById("sw_from_day_input").value,
-				//toYear    = document.getElementById("sw_to_year_input").value,
-				//toMonth   = document.getElementById("sw_to_month_input").value,
-				//toDay     = document.getElementById("sw_to_day_input").value;
-
-			if(keywords == "" || limit == ""){
-				var hintWords = "Caution! \nBoth Keywords and Limit Number must be filled! " ;
-				alert(hintWords);
-			}
-
-			//var startTime = new Date(fromYear, fromMonth, fromDay, 0, 0, 0, 0),
-			//	endTime   = new Date(toYear, toMonth, toDay, 0, 0, 0, 0);
-
-			var para = {
-			//	startTime: startTime.getTime(),
-			//	endTime: endTime.getTime(),
-				keywords: keywords,
-				limit: limit
-			};
-
-			var reportTexts = [],
-				basicInfos  = [];
-
-			// Search crime records whose remarks field contains indicated keywords
-			requestBackEnd(para, "/searchKeywords")
-				// Extract ids from the matched crime records
-				.then(
-					function (matchedItems) {
-						if (matchedItems.length <= 0) {
-							// todo:
-						}
-
-						//highlight keywords
-						for(var i=0;i<matchedItems.length;i++){
-							matchedItems[i]["remarks"] = maps.highlightKeywords(keywords,matchedItems[i]["remarks"]);
-						}
-
-
-						reportTexts = matchedItems;
-						var ids = _.chain(matchedItems)
-							.map(function(item){return _.values(item);})
-							.unzip().last().value();
-						return requestBackEnd({ crimeIds:  ids }, "/getBasicInfos"); },
-					function (msg) {
-						alert("failed 1");
-					})
-				.then(
-					function (filterPoints) {
-						var ids = _.map(filterPoints, function(item){return item["id"];});
-						basicInfos = filterPoints;
-						return requestBackEnd({crimeIds:  ids}, "/getSimilaritiesMatrix");
-					},
-					function (msg) {
-						alert("failed 2");
-					})
-				// Plot points on the map based on the extracted ids
-				.then(
-					function (simMat) {
-						// Remove the current result on the map
-						if (queryMarkers != null) {
-							maps.clearMarkers(queryMarkers,queryLines);
-							queryMarkers = null;
-						}
-						// Remove the current lines on the map
-						if (queryLines   != null) {
-							maps.clearLines(queryLines);
-							queryLines   = null;
-						}
-						// Prepare the points which be painted on the map
-						var normalPoints = [];
-						for (var i=0; i<reportTexts.length; i++) {
-							normalPoints.push({
-								position: basicInfos[i]["position"],
-								color:    colorbar(500),
-								weight:   10,
-								// For info window
-								id:    basicInfos[i]["id"],
-								label: basicInfos[i]["label"],
-								text:  reportTexts[i]["remarks"],
-								date:  reportTexts[i]["update_date"],
-								priority: basicInfos[i]["priority"]});
-						}
-						// Place lines on the map
-						//console.log(requestBackEnd(para, "/searchKeywords"));
-						if (simMat.length > 0) {
-							queryLines = maps.createLines(normalPoints, simMat);
-						}
-						// Place the marker on the map
-						queryMarkers = maps.createSimilarMarkers(normalPoints, queryLines);
-
-						//maps.showLines(queryLines);
-					},
-					function (msg) {
-						alert("failed 3");
-					});
-
-
-
-		};
-		function removeDis(id){
-
-		}
-		function limitDate(status) {
-			if (status == "from"){
-	 			var yearId  = "si_from_year_input",
-	 			    monthId = "si_from_month_input",
-	 			    dayId   = "si_from_day_input";
-	 		}
-	 		else if(status == "to"){
-	 			var yearId  = "si_to_year_input",
-	 			    monthId = "si_to_month_input",
-	 			    dayId   = "si_to_day_input";
-	 		}
-
-			var regExp = /[0-9]$/;
-	    	var year  = document.getElementById(yearId).value.trim();
-	    	var	month = document.getElementById(monthId).value.trim();
-	    	var day   = document.getElementById(dayId).value.trim();
-
-			if(year == "" || !regExp.test(year)){
-	        	document.getElementById(monthId).setAttribute("disabled","disabled");
-	        	document.getElementById(dayId).setAttribute("disabled","disabled");
-	        	document.getElementById(monthId).value = "";
-	        	document.getElementById(dayId).value = "";
-	    	}
-	    	else{
-	    		document.getElementById(monthId).removeAttribute("disabled");
-
-	        	if(month == "" || !regExp.test(month)){
-	        		document.getElementById(dayId).setAttribute("disabled","disabled");
-	            	document.getElementById(dayId).value = "";
-	        	}
-		        else{
-		        	document.getElementById(dayId).removeAttribute("disabled");
-		            if(day == "" || !regExp.test(day)){
-		            	document.getElementById(dayId).value = "";
-		        	}
-	        	}
-	        }
-	    }
     </script>
 
 </html>
