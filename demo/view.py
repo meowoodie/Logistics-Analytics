@@ -33,10 +33,11 @@ def similar_companies():
 	# Parse requested parameters
 	if request.method == "POST":
 		para_dict   = json.loads(request.data)
+        print para_dict
 		company_id  = para_dict["companyId"]
 		down_stream = para_dict["downStream"]
         up_stream   = para_dict["upStream"]
-        rec_num     = para_dict["recNum"]
+        rec_num     = int(para_dict["recNum"])
         areas       = para_dict["areas"]
         # fetch results from database
         res = recommend_res_handler[company_id]
