@@ -1,0 +1,12 @@
+{
+  "apd_ds": {
+    "host": "localhost",
+    "port": 3306,
+    "url": "mysql://root:woodielove2010@localhost/APD_Data",
+    "database": "APD_Data",
+    "password": "woodielove2010",
+    "name": "apd_ds",
+    "user": "root",
+    "connector": "mysql"
+  }
+}
