@@ -34,8 +34,8 @@ def similar_companies():
 	if request.method == "POST":
 		para_dict   = json.loads(request.data)
         print para_dict
-		company_id  = para_dict["companyId"]
-		down_stream = para_dict["downStream"]
+        company_id  = para_dict["companyId"]
+        down_stream = para_dict["downStream"]
         up_stream   = para_dict["upStream"]
         rec_num     = int(para_dict["recNum"])
         areas       = para_dict["areas"]
@@ -45,10 +45,14 @@ def similar_companies():
         up_scores   = res["up_scores"][:rec_num]
         down_ids    = res["down_ids"][:rec_num]
         down_scores = res["down_scores"][:rec_num]
+        print up_ids
+        print up_scores
+        print down_ids
+        print down_scores
         if up_stream:
-            matched_items["ups"] = company_id_handler[up_ids]
+            matched_items["ups"] = company_id_handler.get("company_id", up_ids)
         if down_stream:
-            matched_items["downs"] = company_id_handler[down_ids]
+            matched_items["downs"] = company_id_handler.get("company_id", down_ids)
 	else:
 		return json.dumps({
 			"status": 1,
