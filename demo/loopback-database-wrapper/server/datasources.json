@@ -8,5 +8,15 @@
     "name": "apd_ds",
     "user": "root",
     "connector": "mysql"
+  },
+  "sfexpress_ds": {
+    "host": "localhost",
+    "port": 3306,
+    "url": "mysql://root:woodielove2010@localhost/sfexpress",
+    "database": "sfexpress",
+    "password": "woodielove2010",
+    "name": "sfexpress_ds",
+    "user": "root",
+    "connector": "mysql"
   }
 }

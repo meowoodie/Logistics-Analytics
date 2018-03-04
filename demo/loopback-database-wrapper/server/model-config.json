@@ -20,5 +20,13 @@
   "report_text": {
     "dataSource": "apd_ds",
     "public": true
+  },
+  "company_info": {
+    "dataSource": "sfexpress_ds",
+    "public": true
+  },
+  "recom_res": {
+    "dataSource": "sfexpress_ds",
+    "public": true
   }
 }

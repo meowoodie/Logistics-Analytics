@@ -1,0 +1,38 @@
+{
+  "name": "company_info",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "id": true,
+      "required": true
+    },
+    "lat": {
+      "type": "float"
+    },
+    "lng": {
+      "type": "float"
+    },
+    "main_business" : {
+      "type": "string"
+    },
+    "is_oversea" : {
+      "type": "string"
+    },
+    "industry_lv1": {"type": "string"},
+    "industry_lv2": {"type": "string"},
+    "industry_lv3": {"type": "string"},
+    "area_code": {"type": "string"},
+    "area_desc": {"type": "string"},
+    "city": {"type": "string"},
+    "coop_month" : {"type": "int"}
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
