@@ -30,6 +30,22 @@ maps = {
             // styles: [{"featureType":"water","stylers":[{"saturation":43},{"lightness":-11},{"hue":"#0088ff"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"hue":"#ff0000"},{"saturation":-100},{"lightness":99}]},{"featureType":"road","elementType":"geometry.stroke","stylers":[{"color":"#808080"},{"lightness":54}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"color":"#ece2d9"}]},{"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"color":"#ccdca1"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#767676"}]},{"featureType":"road","elementType":"labels.text.stroke","stylers":[{"color":"#ffffff"}]},{"featureType":"poi","stylers":[{"visibility":"off"}]},{"featureType":"landscape.natural","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#b8cb93"}]},{"featureType":"poi.park","stylers":[{"visibility":"on"}]},{"featureType":"poi.sports_complex","stylers":[{"visibility":"on"}]},{"featureType":"poi.medical","stylers":[{"visibility":"on"}]},{"featureType":"poi.business","stylers":[{"visibility":"simplified"}]}]
         });
     },
+
+    fitBound: function(markers){
+      var bounds = new google.maps.LatLngBounds();
+          // center = {lat:0, lng:0};
+      for (var i = 0; i < markers.length; i++) {
+        // center['lat'] = center['lat'] + pos['lat'];
+        // center['lng'] = center['lng'] + pos['lng'];
+        bounds.extend(markers[i].getPosition());
+      }
+      // center['lat'] = center['lat']/markers.length;
+      // center['lng'] = center['lng']/markers.length;
+      mapObj.setCenter(bounds.getCenter());
+      mapObj.fitBounds(bounds);
+      // console.log(bounds.getCenter())
+    },
+
     createRecommendedMarkers: function(points, lines){
       return _.map(points, function(point){
         var marker = new google.maps.Marker({
@@ -42,24 +58,24 @@ maps = {
             strokeOpacity: 1.0,
             strokeColor: point["color"],
             strokeWeight: 1.0,
-            scale: point["weight"] * 10
+            scale: (point["weight"]+0.5) * 10
           }
         });
-
         // add addListener
         var infoWindowHtml = String.format('\
-            <div class="row">\
-                <div class="col-md-6">\
-                    <h3 class="card-title">Info for COM {0}</h3>\
+            <div class="content" style="height:100%">\
+                <div class="row">\
+                  <div class = "col-md-8 col-lg-offset-2">\
+                        <div class="row"><p class="card-text">Company ID {0}</p></div>\
+                        <div class="row"><p class="card-text">Main Business {1}</p></div>\
+                        <div class="row"><p class="card-text">Indust_lv1 {2}</p></div>\
+                        <div class="row"><p class="card-text">City {3}</p></div>\
+                        <div class="row"><p class="card-text">Rank {4}</p></div>\
+                        <div class="row"><p class="card-text">Score {5}</p></div>\
+                  </div>\
                 </div>\
-                <div class="col-md-6">\
-                    <div class="row"><p class="card-text">Main Business {1}</p></div>\
-                    <div class="row"><p class="card-text">Indust_lv1 {2}</p></div>\
-                    <div class="row"><p class="card-text">City {3}</p></div>\
-                </div>\
-            </div>\
-            <div class="collapse" id="collapse_remarks_{0}"><div class="well"><p class="card-text">{3}</p></div></div>',
-            point["id"], point["mb"], point["ind1"], point["city"], point["priority"]);
+            </div>',
+            point["id"], point["mb"], point["ind1"], point["city"], point['rank'], point["score"]);
         createInfoWindow(marker, infoWindowHtml);
         return marker;
       })
@@ -110,10 +126,10 @@ maps = {
             var datetime = new Date(point["date"]*1000);
             var infoWindowHtml = String.format('\
                 <div class="row">\
-                    <div class="col-md-6">\
+                    <div class="col-md-8">\
                         <h3 class="card-title">Crime ID {0}</h3>\
                     </div>\
-                    <div class="col-md-6">\
+                    <div class="col-md-8">\
                         <div class="row"><p class="card-text">Priority [{4}]</p></div>\
                         <div class="row"><p class="card-text">Catagory [{1}]</p></div>\
                         <div class="row"><p class="card-text">Occurred At {2}</p></div>\

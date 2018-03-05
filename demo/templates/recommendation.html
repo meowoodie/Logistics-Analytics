@@ -193,38 +193,93 @@
 				recNum: Rec_n.value,
 				areas: Rec_Area.value
 			};
-			console.log(para);
 			requestBackEnd(para,"/similarCompanies").then(function(Rec_info){
-				console.log(Rec_info);
+				if (queryMarkers != null) {
+					maps.clearMarkers(queryMarkers);
+					queryMarkers = null;
+				}
 				var downStream = document.getElementById("Down_checkbox"),
-						upStream = document.getElementById("Up_checkbox");
+						upStream   = document.getElementById("Up_checkbox"),
+						colorPointsUpStream   = new Array(),
+						colorPointsDownStream = new Array();
 				if (downStream.checked == true){
+					console.log(Rec_info);
 					weight = _.map(Rec_info['downs'], function(info, companyID){
 						return(info['score'])
 					});
 					weight_max = _.max(weight);
 					weight_min = _.min(weight);
-					var colorPoints =  _.map(Rec_info['downs'], function(info, companyID){
+					colorPointsDownStream =  _.map(Rec_info['downs'], function(info, rank){
+						// TODO: a patch for fixing wrong location info for Xi'an City
+						if (info['area_code'] == "029Y"){
+							info['lat'] = 34.3416;
+							info['lng'] = 108.9398;
+						}
+						if (info['area_code'] == "760Y"){
+							info['lat'] = 22.5176;
+							info['lng'] = 113.3928;
+						}
+						if (info['area_code'] == "024Y"){
+							info['lat'] = 41.8057;
+							info['lng'] = 123.4315;
+						}
 						return{
 							position: {'lat': info['lat'], 'lng': info['lng']},
-							color: colorbar(005),
-							weight: 0,
-							id: companyID,
+							color: "blue",
+							id: info["company_id"],
 							mb: info['main_business'],
 							os: info['is_oversea'],
 							score: info['score'],
 							weight: (info['score'] - weight_min)/(weight_max - weight_min),
-							ind1: info['indust_lv1'],
-							ind2: info['indust_lv2'],
-							ind3: info['indust_lv3'],
+							ind1: info['industry_lv1'],
+							ind2: info['industry_lv2'],
+							ind3: info['industry_lv3'],
 							city: info['city'],
-							coop_m: info['coop_month']
+							coop_m: info['coop_month'],
+							relation: 'Down Stream',
+							rank: rank
 						}
 					});
-					console.log(colorPoints);
-					queryMarkers = maps.createRecommendedMarkers(colorPoints,[]);
 				}
-
+				if (upStream.checked == true){
+					colorPointsUpStream =  _.map(Rec_info['ups'], function(info, rank){
+						console.log(rank);
+						// TODO: a patch for fixing wrong location info for Xi'an City
+						if (info['area_code'] == "029Y"){
+							info['lat'] = 34.3416;
+							info['lng'] = 108.9398;
+						}
+						if (info['area_code'] == "760Y"){
+							info['lat'] = 22.5176;
+							info['lng'] = 113.3928;
+						}
+						if (info['area_code'] == "024Y"){
+							info['lat'] = 41.8057;
+							info['lng'] = 123.4315;
+						}
+						return{
+							position: {'lat': info['lat'], 'lng': info['lng']},
+							color: "red",
+							id: info["company_id"],
+							mb: info['main_business'],
+							os: info['is_oversea'],
+							score: info['score'],
+							weight: (info['score'] - weight_min)/(weight_max - weight_min),
+							ind1: info['industry_lv1'],
+							ind2: info['industry_lv2'],
+							ind3: info['industry_lv3'],
+							city: info['city'],
+							coop_m: info['coop_month'],
+							relation:'Up Stream',
+							rank:rank
+						}
+					});
+				}
+				var colorPoints = colorPointsUpStream.concat(colorPointsDownStream);
+				console.log(colorPoints);
+				queryMarkers = maps.createRecommendedMarkers(colorPoints,[]);
+				// console.log(queryMarkers);
+				maps.fitBound(queryMarkers);
 			}, function (msg) {
 				alert(msg);
 			});
