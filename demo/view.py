@@ -29,10 +29,11 @@ def Recommendation():
 # API for searching similar company ids with their scores by query id
 @app.route("/similarCompanies", methods=["POST"])
 def similar_companies():
-	matched_items = {}
-	# Parse requested parameters
-	if request.method == "POST":
-		para_dict   = json.loads(request.data)
+    matched_items = {}
+    # Parse requested parameters
+    print request.method
+    if request.method == "POST":
+    	para_dict   = json.loads(request.data)
         print para_dict
         company_id  = para_dict["companyId"]
         down_stream = para_dict["downStream"]
@@ -71,11 +72,11 @@ def similar_companies():
                         break
                 cand["score"] = score
                 matched_items["downs"].append(cand)
-	else:
-		return json.dumps({
-			"status": 1,
-			"msg": "Invalid Request Type" })
+    else:
+    	return json.dumps({
+    		"status": 1,
+    		"msg": "Invalid Request Type" })
 
-	return json.dumps({
-		"status": 0,
-		"res": matched_items })
+    return json.dumps({
+    	"status": 0,
+    	"res": matched_items })

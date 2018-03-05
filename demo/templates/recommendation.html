@@ -193,6 +193,7 @@
 				recNum: Rec_n.value,
 				areas: Rec_Area.value
 			};
+			console.log(para);
 			requestBackEnd(para,"/similarCompanies").then(function(Rec_info){
 				if (queryMarkers != null) {
 					maps.clearMarkers(queryMarkers);
@@ -243,7 +244,11 @@
 				}
 				if (upStream.checked == true){
 					colorPointsUpStream =  _.map(Rec_info['ups'], function(info, rank){
-						console.log(rank);
+						weight = _.map(Rec_info['ups'], function(info, companyID){
+							return(info['score'])
+						});
+						weight_max = _.max(weight);
+						weight_min = _.min(weight);
 						// TODO: a patch for fixing wrong location info for Xi'an City
 						if (info['area_code'] == "029Y"){
 							info['lat'] = 34.3416;
