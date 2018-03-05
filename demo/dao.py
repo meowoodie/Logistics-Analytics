@@ -126,5 +126,13 @@ if __name__ == "__main__":
 	# dao = CompanyInfo("gatech1234!")
 	# print dao.get("company_id", ["0000841919", "0000536923"])
 
-	dao = RecommendResult("gatech1234!")
-	print dao["0000536923"]
+	dao1 = RecommendResult("gatech1234!")
+	dao2 = CompanyInfo("gatech1234!")
+	res = dao1["0000841919"]
+	up_ids      = res["up_ids"][:20]
+	up_scores   = res["up_scores"][:20]
+	down_ids    = res["down_ids"][:20]
+	down_scores = res["down_scores"][:20]
+	items = dao2.get("company_id", up_ids)
+	print up_ids
+	print [ i["company_id"] for i in items ]

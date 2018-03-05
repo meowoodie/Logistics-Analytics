@@ -46,13 +46,31 @@ def similar_companies():
         down_ids    = res["down_ids"][:rec_num]
         down_scores = res["down_scores"][:rec_num]
         if up_stream:
-            matched_items["ups"] = company_id_handler.get("company_id", up_ids)
-            for score, item in zip(up_scores, matched_items["ups"]):
-                item["score"] = score
+            unsorted_items = company_id_handler.get("company_id", up_ids)
+            matched_items["ups"] = []
+            for i in range(len(up_ids)):
+                _id   = up_ids[i]
+                score = up_scores[i]
+                cand  = {}
+                for item in unsorted_items:
+                    if item["company_id"] == _id:
+                        cand = item
+                        break
+                cand["score"] = score
+                matched_items["ups"].append(cand)
         if down_stream:
-            matched_items["downs"] = company_id_handler.get("company_id", down_ids)
-            for score, item in zip(down_scores, matched_items["downs"]):
-                item["score"] = score
+            unsorted_items = company_id_handler.get("company_id", down_ids)
+            matched_items["downs"] = []
+            for i in range(len(down_ids)):
+                _id   = down_ids[i]
+                score = down_scores[i]
+                cand  = {}
+                for item in unsorted_items:
+                    if item["company_id"] == _id:
+                        cand = item
+                        break
+                cand["score"] = score
+                matched_items["downs"].append(cand)
 	else:
 		return json.dumps({
 			"status": 1,
