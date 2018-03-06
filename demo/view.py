@@ -26,6 +26,10 @@ recommend_res_handler = RecommendResult(token)
 def Recommendation():
     return render_template("recommendation.html")
 
+@app.route("/analysis")
+def Analysis():
+    return render_template("analysis.html")
+
 # API for searching similar company ids with their scores by query id
 @app.route("/similarCompanies", methods=["POST"])
 def similar_companies():

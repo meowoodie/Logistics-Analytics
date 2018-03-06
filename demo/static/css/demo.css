@@ -13,6 +13,17 @@
     }
 }
 
+
+#downShowWin {
+  max-height: 300px;
+  overflow: auto;
+}
+#upShowWin {
+  max-height: 300px;
+  overflow: auto;
+}
+
+
 #map{
     position:relative;
     width:100%;
@@ -62,8 +73,7 @@
     margin-top: 0;
 }
 
-#mark { 
+#mark {
     background-color: red;
     color: black;
 }
-

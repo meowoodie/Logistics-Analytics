@@ -31,6 +31,10 @@ maps = {
         });
     },
 
+    reCenter: function(center){
+      mapObj.setCenter(center);
+    },
+
     fitBound: function(markers){
       var bounds = new google.maps.LatLngBounds();
           // center = {lat:0, lng:0};
@@ -66,16 +70,16 @@ maps = {
             <div class="content" style="height:100%">\
                 <div class="row">\
                   <div class = "col-md-8 col-lg-offset-2">\
-                        <div class="row"><p class="card-text">Company ID {0}</p></div>\
-                        <div class="row"><p class="card-text">Main Business {1}</p></div>\
-                        <div class="row"><p class="card-text">Indust_lv1 {2}</p></div>\
-                        <div class="row"><p class="card-text">City {3}</p></div>\
-                        <div class="row"><p class="card-text">Rank {4}</p></div>\
-                        <div class="row"><p class="card-text">Score {5}</p></div>\
+                        <div class="row"><p class="card-text">公司 ID: {0}</p></div>\
+                        <div class="row"><p class="card-text">主营业务: {1}</p></div>\
+                        <div class="row"><p class="card-text">行业类型_lv1: {2}</p></div>\
+                        <div class="row"><p class="card-text">城市: {3}</p></div>\
+                        <div class="row"><p class="card-text">排名: {4}({6})</p></div>\
+                        <div class="row"><p class="card-text">分数: {5}</p></div>\
                   </div>\
                 </div>\
             </div>',
-            point["id"], point["mb"], point["ind1"], point["city"], point['rank'], point["score"]);
+            point["id"], point["mb"], point["ind1"], point["city"], point['rank'], point["score"], point["relation"]=="Down Stream"?"下游推荐":"上游推荐");
         createInfoWindow(marker, infoWindowHtml);
         return marker;
       })
