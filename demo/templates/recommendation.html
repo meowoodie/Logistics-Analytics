@@ -224,10 +224,19 @@
 				          </h4>\
 				        </div>\
 				        <div id="collapse{3}{0}" class="panel-collapse collapse">\
-				          <div class="panel-body" onclick = "setCenter({0}, {3})">{2}</div>\
+				          <div class="panel-body" onclick = "setCenter({0}, {6})">\
+										公司 ID: {1} </br> \
+										主营业务: {2}</br>\
+										行业类型_lv1: {3}</br>\
+										城市: {4}</br>\
+										排名: {8}({7})</br>\
+										分数: {5}</br>\
+									</div>\
 				        </div>\
 				      </div>\
-				',i, Rec_info_list[i]["company_id"], Rec_info_list[i]["main_business"],type=='down'?1:0);
+				',i, Rec_info_list[i]["company_id"], Rec_info_list[i]["main_business"],
+				Rec_info_list[i]["industry_lv1"],Rec_info_list[i]["city"],Rec_info_list[i]["score"],
+				type=='down'?1:0, type=='down'?"下游推荐":"上游推荐", i+1);
 			}
 			showWindow.innerHTML = str;
 
@@ -266,6 +275,8 @@
 					maps.clearMarkers(queryMarkers);
 					queryMarkers = null;
 				}
+				document.getElementById("downShowWin").innerHTML = "(空)";
+				document.getElementById("upShowWin").innerHTML = "(空)";
 				var downStream = document.getElementById("Down_checkbox"),
 						upStream   = document.getElementById("Up_checkbox");
 				if (downStream.checked == true){
