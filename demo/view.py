@@ -62,7 +62,8 @@ def similar_companies():
                         cand = item
                         break
                 cand["score"] = score
-                matched_items["ups"].append(cand)
+                if cand["area_code"] in areas:
+                    matched_items["ups"].append(cand)
         if down_stream:
             unsorted_items = company_id_handler.get("company_id", down_ids)
             matched_items["downs"] = []
@@ -71,11 +72,12 @@ def similar_companies():
                 score = down_scores[i]
                 cand  = {}
                 for item in unsorted_items:
-                    if item["company_id"] == _id and item["area_code"] in areas:
+                    if item["company_id"] == _id:
                         cand = item
                         break
                 cand["score"] = score
-                matched_items["downs"].append(cand)
+                if cand["area_code"] in areas:
+                    matched_items["downs"].append(cand)
     else:
     	return json.dumps({
     		"status": 1,
