@@ -98,6 +98,8 @@
 											<div class = "card">
 												<div class = "card-content">
 													<div class = "card-body" style = "position: relative">
+														<div class = "row">
+															<div class  ="col-md-12">
 														<h5 class="card-title">控制面板</h5>
 														<div class="checkbox">
 															<label class="checkbox-inline"><input id="Down_checkbox" type="checkbox" value="Down" onclick = "DU_checkbox_click()">推荐下游</label>
@@ -127,26 +129,28 @@
 																<!-- <input type="text" class="form-control" id="ReArea"> -->
 															<!-- </div> -->
 														</form>
-
+													</div>
+													</div>
 														<div class="panel panel-default">
 															<div class="panel-heading">
-																<h4 class="panel-title">
+																<div class="panel-title row" >
 
-																<div class="checkbox">
-
-																	<label class="checkbox">
-																	<a data-toggle="collapse" href="#collapseCityCodeCB">
-																		区域
+																	<a  class = "col-lg-3"id='area'data-toggle="collapse" href="#collapseCityCodeCB">
+																		<h4>区域</h4>
 																	</a>
+																	<div class="checkbox col-lg-9 text-right" id='areaAllCheckBox'>
 
-																			<input id="cityCodeAll" type="checkbox" onclick = "cityCodeAll()">
+																		<label class="checkbox">
+
+																		<input id="cityCodeAll" type="checkbox" onclick = "cityCodeAllClick()">
 																			全选
 																		</label>
 																	</div>
 																	<!-- <input type="checkbox" id="cityCodeAll" name="checkbox" class="material-checkbox" onclick = "cityCodeAll()">
 																	<label class="material-checkbox-group__label" for="cityCodeAll">全选</label> -->
-																</h4>
 															</div>
+
+														</div>
 															<div id="collapseCityCodeCB" class="panel-collapse collapse" >
 																<div class="panel-body" id="cityCodePanel">
 																<div id="cityCodeCheckBox">
@@ -241,8 +245,6 @@
 
 		var queryMarkers = null;
 		var queryLines   = null;
-		var colorPointsUpStream   = new Array();
-		var colorPointsDownStream = new Array();
 		var areaChecked = false;
 
 		// Onclick event for Down-up checkbox
@@ -251,11 +253,27 @@
 		  var DowncheckBox = document.getElementById("Down_checkbox"),
 					UpcheckBox = document.getElementById('Up_checkbox');
 		  // if one of the box checked then compute btn enable
-			if ((DowncheckBox.checked == true)||(UpcheckBox.checked == true)){
+			if (((DowncheckBox.checked == true)||(UpcheckBox.checked == true))&&(areaChecked)){
 				document.getElementById("compute_btn").removeAttribute("disabled");
 			} else{
 				document.getElementById("compute_btn").setAttribute("disabled", "disabled");
 			};
+		};
+
+		// Onclick event for area check UpcheckBox
+		function areaCheckBoxClick() {
+			// Get the checkbox
+			areaChecked = false;
+			var areaAllChecked = true;
+			for(i=0; i<cityCodeList.length;i++){
+				if (document.getElementById("cityCodeCheckBox" + i.toString()).checked){
+					areaChecked = true;
+				}else{
+					areaAllChecked  =false;
+				}
+			};
+			document.getElementById("cityCodeAll").checked = areaAllChecked;
+			DU_checkbox_click();
 		};
 
 		//Show city list
@@ -279,7 +297,7 @@
 				<div class="col-md-3">\
 				<div class="checkbox">\
 					<label class="checkbox">\
-					<input id="cityCodeCheckBox{0}" type="checkbox">',i) +'</br><small>'+ cityCodeList[i] +'<small></label>\
+					<input id="cityCodeCheckBox{0}" type="checkbox" onclick = "areaCheckBoxClick()">',i) +'</br><small>'+ cityCodeList[i] +'<small></label>\
 				</div>\
 				</div>'
 		};
@@ -296,10 +314,13 @@
 
 		// Check all city Codes
 
-		function cityCodeAll(){
+		function cityCodeAllClick(){
 			for(i=0; i<cityCodeList.length;i++){
 				document.getElementById("cityCodeCheckBox"+i.toString()).checked =document.getElementById("cityCodeAll").checked;
-			}
+			};
+			areaChecked = document.getElementById("cityCodeAll").checked;
+			areaCheckBoxClick();
+			DU_checkbox_click();
 		};
 
 		// Show recommendation list
@@ -353,6 +374,8 @@
 
 		// Onclick event for search Id button
 		computeBtn.onclick = function () {
+			var colorPointsUpStream   = new Array();
+			var colorPointsDownStream = new Array();
 			var CompanyID = document.getElementById("CompanyID"),
 					downStream = document.getElementById("Down_checkbox"),
 			    upStream = document.getElementById("Up_checkbox"),

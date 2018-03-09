@@ -44,6 +44,10 @@
     height: 100%;
 }
 
+/* #area, #areaAllCheckBox{
+  display:inline;
+} */
+
 .mh1 div {
   height: 150px; /* 30% of viewport height*/
 }
