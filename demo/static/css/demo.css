@@ -22,12 +22,30 @@
   max-height: 300px;
   overflow: auto;
 }
+#cityCodePanel {
+  max-height: 150px;
+  overflow: auto;
+}
+#gtlogo {
+  max-height: 40px;
+  max-width: 40px;
+  overflow: auto;
+}
 
+#sflogo {
+  max-height: 40px;
+  max-width: 40px;
+  overflow: auto;
+}
 
 #map{
     position:relative;
     width:100%;
     height: 100%;
+}
+
+.mh1 div {
+  height: 150px; /* 30% of viewport height*/
 }
 
 .places-buttons .btn{

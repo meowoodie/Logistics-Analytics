@@ -37,12 +37,20 @@
 		    -->
 
 			<div class="logo">
-				<a href="http://www.creative-tim.com" class="simple-text">
-					顺丰科技 <br/>物流网络分析
-				</a>
+				<div class = "row">
+					<div class = "col-md-2">
+					</div>
+					<div class = "col-md-8">
+						<a href="http://www.creative-tim.com" class="simple-text">
+							顺丰科技 <br/>物流网络分析
+						</a>
+					</div>
+				<div class = "col-md-2">
+				</div>
+			</div>
 			</div>
 	    	<div class="sidebar-wrapper">
-				<ul class="nav">
+				<ul class="nav" style="height:80%">
 					<!-- <li class = "nav-item">
 						<div class="row">
     					<div class="col-lg-10 col-lg-offset-1">
@@ -62,14 +70,22 @@
 	                        <p>统计分析</p>
 	                    </a>
 	                </li>
-	                <li>
+	                <!-- <li>
 	                    <a href="typography.html">
 	                        <i class="material-icons">library_books</i>
 	                        <p>记录</p>
 	                    </a>
-	                </li>
+	                </li> -->
+
 	            </ul>
+							<div class = "col-lg-4 col-lg-offset-2">
+							<img class="materialboxed responsive-img" width="50" height="50" src="../static/img/sflogo.png">
+						</div>
+						<div class="col-lg-4">
+							<img class="materialboxed responsive-img" width="50" height="50"src="../static/img/gtlogo.gif">
+						</div>
 	    	</div>
+
 		</div>
 
 	    <div class="main-panel">
@@ -96,11 +112,48 @@
 																<label class = "control-label">推荐数量</label>
 																<input type="text" class="form-control" id="ReNum">
 															</div>
-															<div class="form-group label-floating">
-																<label class = "control-label">区域</label>
-																<input type="text" class="form-control" id="ReArea">
-															</div>
+															<!-- <div class="form-group label-floating">
+																<label class = "control-label" >区域</label> -->
+		<!-- <div class="row">
+			<div class="col-md-2">
+				<input type="checkbox" id="checkbox0" name="checkbox" class="material-checkbox">
+				<label class="material-checkbox-group__label" for="checkbox0">071Y</label>
+			</div>
+			<div class="col-md-2" >
+				<input type="checkbox" id="checkbox1" name="checkbox" class="material-checkbox">
+				<label class="material-checkbox-group__label" for="checkbox1">071Y</label>
+			</div>
+		</div> -->
+																<!-- <input type="text" class="form-control" id="ReArea"> -->
+															<!-- </div> -->
 														</form>
+
+														<div class="panel panel-default">
+															<div class="panel-heading">
+																<h4 class="panel-title">
+
+																																		<div class="checkbox">
+
+																																																					<label class="checkbox">
+																	<a data-toggle="collapse" href="#collapseCityCodeCB">
+																		区域
+																	</a>
+
+																			<input id="cityCodeAll" type="checkbox" onclick = "cityCodeAll()">
+																			全选
+																		</label>
+																	</div>
+																	<!-- <input type="checkbox" id="cityCodeAll" name="checkbox" class="material-checkbox" onclick = "cityCodeAll()">
+																	<label class="material-checkbox-group__label" for="cityCodeAll">全选</label> -->
+																</h4>
+															</div>
+															<div id="collapseCityCodeCB" class="panel-collapse collapse" >
+																<div class="panel-body" id="cityCodePanel">
+																<div id="cityCodeCheckBox">
+																</div>
+																</div>
+															</div>
+														</div>
 														<button id="compute_btn" class="btn btn-success pull-right" 	disabled="disabled">输入</button>
 													</div>
 												</div>
@@ -205,6 +258,50 @@
 			};
 		};
 
+		//Show city list
+		var cityCodeList = ["001", "010Y", "020Y", "021Y", "022Y", "023Y", "024Y", "025Y", "027Y", "028Y", "029Y", "311Y",
+												"316Y", "351Y", "371Y", "395Y", "411Y", "431Y", "451Y", "471Y", "510Y", "512Y", "513Y", "517Y",
+												"519Y", "531Y","532Y", "535Y", "536Y", "551Y", "553Y", "571Y", "573Y", "574Y", "575Y", "576Y",
+												"577Y", "579Y", "591Y", "592Y", "594Y", "595Y", "717Y", "731Y", "734Y", "750Y", "752Y", "754Y",
+												"755Y", "757Y", "760Y", "769Y", "769YS", "771Y", "791Y", "797Y", "851Y", "852Y", "871Y", "886Y",
+											  "898Y", "931Y", "951Y", "991Y", "B020Y", "B021Y", "B025Y", "B027Y", "B531Y", "B571Y", "B592Y",
+												"B760Y", "B769Y", "E010RDCY", "E020RDCY", "E021Y", "E027RDCY", "E028RDCY", "FRCDGY", "GBLHRY",
+												"ICNA1Y", "JPTYOY", "MYKULY", "P010Y", "P020Y", "P021Y", "P022Y", "P024Y", "P025Y", "P027Y",
+												"P028Y", "P029Y", "P371Y", "P451Y", "P512Y", "P532Y", "P571Y", "P592Y", "P755Y", "P852Y", "RUMOWY",
+												"SINA1Y", "THBKKY", "USSFOY", "VNSGNY"];
+		var str = '<div class = "row">';
+		for(i=0; i<cityCodeList.length;i++){
+			if ((i>0)&&(i%4==0)){
+				str = str + '</div>\
+				<div class = "row">'
+			};
+			str = str +String.format('\
+				<div class="col-md-3">\
+				<div class="checkbox">\
+					<label class="checkbox">\
+					<input id="cityCodeCheckBox{0}" type="checkbox">',i) +'</br><small>'+ cityCodeList[i] +'<small></label>\
+				</div>\
+				</div>'
+		};
+				// 	推荐下游</label>
+				// </div>
+				// 	<input type="checkbox" id="cityCodeCheckBox{0}" name="checkbox" class="material-checkbox">\
+				// 	</br>\
+				// 	<label class="material-checkbox-group__label" for="cityCodeCheckBox{0}">',i)+ cityCodeList[i] +'</label>\
+				// </div>'
+
+
+		str = str +'</div>';
+		document.getElementById("cityCodeCheckBox").innerHTML = str;
+
+		// Check all city Codes
+
+		function cityCodeAll(){
+			for(i=0; i<cityCodeList.length;i++){
+				document.getElementById("cityCodeCheckBox"+i.toString()).checked =document.getElementById("cityCodeAll").checked;
+			}
+		};
+
 		// Show recommendation list
 
 		function showRecList(Rec_info_list, type){
@@ -260,14 +357,19 @@
 					downStream = document.getElementById("Down_checkbox"),
 			    upStream = document.getElementById("Up_checkbox"),
 					Rec_n = document.getElementById("ReNum"),
-					Rec_Area = document.getElementById("ReArea");
-
+					// Rec_Area = document.getElementById("ReArea"),
+					areaStr = '';
+			for(i=0; i<cityCodeList.length;i++){
+				if (document.getElementById("cityCodeCheckBox" + i.toString()).checked){
+					areaStr = areaStr +cityCodeList[i] +'\t'
+				}
+			};
 			var para = {
 				companyId:	CompanyID.value,
 				downStream: downStream.checked?1:0, //getTime() returns number of milliseconds
 				upStream: upStream.checked?1:0,		//So divided by 1000 to change to the number of seconds
 				recNum: Rec_n.value,
-				areas: Rec_Area.value
+				areas: areaStr
 			};
 			console.log(para);
 			requestBackEnd(para,"/similarCompanies").then(function(Rec_info){
