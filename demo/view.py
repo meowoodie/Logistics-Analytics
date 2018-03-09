@@ -58,7 +58,7 @@ def similar_companies():
                 score = up_scores[i]
                 cand  = {}
                 for item in unsorted_items:
-                    if item["company_id"] == _id:
+                    if item["company_id"] == _id and item["area_code"] in areas:
                         cand = item
                         break
                 cand["score"] = score
@@ -71,7 +71,7 @@ def similar_companies():
                 score = down_scores[i]
                 cand  = {}
                 for item in unsorted_items:
-                    if item["company_id"] == _id:
+                    if item["company_id"] == _id and item["area_code"] in areas:
                         cand = item
                         break
                 cand["score"] = score
