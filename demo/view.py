@@ -46,12 +46,13 @@ def similar_companies():
         areas       = para_dict["areas"]
         # fetch results from database
         res = recommend_res_handler[company_id]
-        up_ids      = res["up_ids"][:rec_num]
-        up_scores   = res["up_scores"][:rec_num]
-        down_ids    = res["down_ids"][:rec_num]
-        down_scores = res["down_scores"][:rec_num]
+        up_ids      = res["up_ids"]
+        up_scores   = res["up_scores"]
+        down_ids    = res["down_ids"]
+        down_scores = res["down_scores"]
         if up_stream:
             unsorted_items = company_id_handler.get("company_id", up_ids)
+            unsorted_items = [ item for item in unsorted_items if item["area_code"] in areas ]
             matched_items["ups"] = []
             for i in range(len(up_ids)):
                 _id   = up_ids[i]
@@ -62,10 +63,11 @@ def similar_companies():
                         cand = item
                         break
                 cand["score"] = score
-                if cand["area_code"] in areas:
-                    matched_items["ups"].append(cand)
+                matched_items["ups"].append(cand)
+            matched_items["ups"] = matched_items["ups"][:rec_num]
         if down_stream:
             unsorted_items = company_id_handler.get("company_id", down_ids)
+            unsorted_items = [ item for item in unsorted_items if item["area_code"] in areas ]
             matched_items["downs"] = []
             for i in range(len(down_ids)):
                 _id   = down_ids[i]
@@ -76,8 +78,8 @@ def similar_companies():
                         cand = item
                         break
                 cand["score"] = score
-                if cand["area_code"] in areas:
-                    matched_items["downs"].append(cand)
+                matched_items["downs"].append(cand)
+            matched_items["downs"] = matched_items["downs"][:rec_num]
     else:
     	return json.dumps({
     		"status": 1,
