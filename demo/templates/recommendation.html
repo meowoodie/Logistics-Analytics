@@ -358,10 +358,10 @@
 			    upStream = document.getElementById("Up_checkbox"),
 					Rec_n = document.getElementById("ReNum"),
 					// Rec_Area = document.getElementById("ReArea"),
-					areaStr = '';
+					areaList = new Array();
 			for(i=0; i<cityCodeList.length;i++){
 				if (document.getElementById("cityCodeCheckBox" + i.toString()).checked){
-					areaStr = areaStr +cityCodeList[i] +'\t'
+					areaList.push(cityCodeList[i]);
 				}
 			};
 			var para = {
@@ -369,7 +369,7 @@
 				downStream: downStream.checked?1:0, //getTime() returns number of milliseconds
 				upStream: upStream.checked?1:0,		//So divided by 1000 to change to the number of seconds
 				recNum: Rec_n.value,
-				areas: areaStr
+				areas: areaList
 			};
 			console.log(para);
 			requestBackEnd(para,"/similarCompanies").then(function(Rec_info){
