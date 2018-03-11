@@ -28,5 +28,9 @@
   "recom_res": {
     "dataSource": "sfexpress_ds",
     "public": true
+  },
+  "feature_vec": {
+    "dataSource": "sfexpress_ds",
+    "public": true
   }
 }
