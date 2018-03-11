@@ -26,6 +26,15 @@
   max-height: 150px;
   overflow: auto;
 }
+#downSetShowWin{
+  max-height:400px;
+  overflow: auto;
+}
+#upSetShowWin{
+  max-height:400px;
+  overflow: auto;
+}
+
 #gtlogo {
   max-height: 40px;
   max-width: 40px;

@@ -371,11 +371,11 @@
 			console.log(center['position']);
 		};
 
+		var colorPointsUpStream   = new Array();
+		var colorPointsDownStream = new Array();
 
 		// Onclick event for search Id button
 		computeBtn.onclick = function () {
-			var colorPointsUpStream   = new Array();
-			var colorPointsDownStream = new Array();
 			var CompanyID = document.getElementById("CompanyID"),
 					downStream = document.getElementById("Down_checkbox"),
 			    upStream = document.getElementById("Up_checkbox"),
@@ -399,6 +399,8 @@
 				if (queryMarkers != null) {
 					maps.clearMarkers(queryMarkers);
 					queryMarkers = null;
+					colorPointsUpStream   = new Array();
+					colorPointsDownStream = new Array();
 				}
 				document.getElementById("downShowWin").innerHTML = "(空)";
 				document.getElementById("upShowWin").innerHTML = "(空)";
