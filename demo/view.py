@@ -10,7 +10,7 @@ import json
 import arrow
 from flask import Flask, request, url_for, render_template
 
-from dao import CompanyInfo, RecommendResult
+from dao import CompanyInfo, RecommendResult, FeatureVector
 
 app = Flask(__name__)
 
@@ -20,6 +20,7 @@ token = "gatech1234!"
 # Data Handler
 company_id_handler    = CompanyInfo(token)
 recommend_res_handler = RecommendResult(token)
+feature_vec_handler   = FeatureVector(token)
 
 # Renderring main web page
 @app.route("/recommendation")
@@ -29,6 +30,22 @@ def Recommendation():
 @app.route("/analysis")
 def Analysis():
     return render_template("analysis.html")
+
+@app.route("/featureVec", methods=["POST"])
+def feature_vec():
+    if request.method == "POST":
+        para_dict  = json.loads(request.data)
+        company_id = para_dict["companyId"]
+
+        res = feature_vec_handler[company_id]
+    else:
+        return json.dumps({
+    		"status": 1,
+    		"msg": "Invalid Request Type" })
+
+    return json.dumps({
+    	"status": 0,
+    	"res": res })
 
 # API for searching similar company ids with their scores by query id
 @app.route("/similarCompanies", methods=["POST"])

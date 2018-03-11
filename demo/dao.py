@@ -11,6 +11,7 @@ database.
 import arrow
 import json
 import requests
+from ast import literal_eval
 
 BASE_DOMAIN = "139.162.173.91"
 # BASE_DOMAIN = "127.0.0.1"
@@ -93,7 +94,19 @@ class DBConnecter():
 
 		return result
 
+class FeatureVector(DBConnecter):
 
+	def __init__(self, token):
+		self.url   = "https://%s:%s/api/feature_vecs" % (BASE_DOMAIN, CONN_PORT)
+		self.token = token
+		DBConnecter.__init__(self, self.url, self.token)
+
+	@staticmethod
+	def parse(result):
+		for key in result.keys():
+			if "_set" in key:
+				result[key] = literal_eval(result[key])
+		return result
 
 class CompanyInfo(DBConnecter):
 
