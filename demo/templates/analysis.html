@@ -180,7 +180,9 @@
 									<h5>下游各行业比例</h5>
 								</div>
 								<div id='downEmp'>(空)</div>
+								<div id="pieChart1">
 								<canvas id="downPie"height = "400"></canvas>
+								</div>
 							</div>
 						</div>
 							</div>
@@ -193,7 +195,9 @@
 									<h5>上游各行业比例</h5>
 								</div>
 								<div id='upEmp'>(空)</div>
+								<div id = "pieChart2">
 								<canvas id="upPie" height = "400"></canvas>
+								</div>
 							</div>
 						</div>
 							</div>
@@ -285,12 +289,14 @@
 												"rgb(0, 230, 0)","rgb(134, 0, 179)","rgb(230, 138, 0)",
 											"rgb(0, 61, 153)","rgb(179, 0, 89)","rgb(0, 68, 102)"];
 			var para ={companyId:document.getElementById("companyID").value};
+
+			document.getElementById("pieChart1").innerHTML = '<canvas id="downPie"height = "400"></canvas>';
+			document.getElementById("pieChart2").innerHTML = '<canvas id="upPie"height = "400"></canvas>';
 			var chart1 = document.getElementById("downPie").getContext('2d'),
 					chart2 = document.getElementById("upPie").getContext('2d');
 
 			// console.log(para);
 			requestBackEnd(para,'/featureVec').then(function(featureVector){
-				console.log(featureVector);
 				document.getElementById("comArea").innerHTML =featureVector['area'];
 				document.getElementById("comInd").innerHTML =featureVector['indust1'] +'</br> ' + featureVector['indust2'];
 				document.getElementById("comSendAve").innerHTML =Number(featureVector['DayAverage']).toFixed(2);
@@ -306,8 +312,6 @@
 					downSet.push(featureVector['toIndust' + i.toString()+"_set"]);
 					upSet.push(featureVector['fromIndust' + i.toString()+"_set"]);
 				}
-				console.log(dataDown);
-				console.log(dataUp);
 				var dataDownPie = {
 													    datasets: [{
 													        data: dataDown,
@@ -344,12 +348,10 @@
 		}
 
 		function showUpDownSet(type, data){
-			console.log(data);
 			var str = '<div class="panel-group">';
 			var showWindow = type=="to"?document.getElementById("downSetShowWin"):document.getElementById("upSetShowWin");
 			for (i = 0; i < 12; i++) {
 				if (data[i].length ==0){
-					console.log('bbb');
 					continue;
 				}
 
