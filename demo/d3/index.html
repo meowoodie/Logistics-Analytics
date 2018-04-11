@@ -12,7 +12,7 @@
 <script charset="utf-8" src="progressbar.js"></script>
 <script charset="utf-8" src="tooltip.js"></script>
 <script charset="utf-8" src="wbc2.js"></script>
-<script charset="utf-8" src="world-countries2.js"></script>
+<script charset="utf-8" src="world-countries.js"></script>
 <script charset="utf-8" src="D3Data.js"></script>
 <script charset="utf-8" src="meta.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
@@ -353,8 +353,8 @@ var setting = {
     , showHistogram : true // displaying histogram of changed files
     , showHalo : true // show a child's halo
     , padding : 0 // padding around a parent
-    , rateOpacity : .5 // rate of decrease of opacity
-    , rateFlash : 2.5 // rate of decrease of flash
+    , rateOpacity : 1.5 // rate of decrease of opacity
+    , rateFlash : 5.5 // rate of decrease of flash
     , sizeChild : 2 // size of child
     , sizeParent : 5 // size of parent
     , showPaddingCircle : false // show circle of padding
@@ -363,7 +363,7 @@ var setting = {
     , showParent : false // show a parent
     , showLabel : false // show base name
     , showMessage : false // show commit message
-    , skipEmptyDate : true // skip empty date
+    , skipEmptyDate : false // skip empty date
     , blendingLighter : true
     , showTrack : true // show tracks
     , showEdge : false // show an edge
@@ -502,7 +502,7 @@ var ONE_SECOND = 1000,
                 n.y = a.y;
                 n.paths = [{x : n.x, y : n.y}];
                 n.msize = n.size;
-                n.size *= 3;
+                n.size *= 1;
             }
             else {
                 n.size = n.hasOwnProperty("msize") ? n.msize : n.size;
@@ -529,9 +529,9 @@ var ONE_SECOND = 1000,
                 (fn = n.ext.now.indexOf(fn)) > -1
                 && n.ext.now.splice(parseInt(fn), 1);
 
-                n.flash *= .5;
-                n.alive *= .2;
-                n.opacity *= .5;
+                n.flash *= .2;
+                n.alive *= .02;
+                n.opacity *= .2;
             }
 
             var key = a.id + "_" + n.id,
@@ -700,9 +700,9 @@ var ONE_SECOND = 1000,
     function randomTrue() {
         return Math.floor(rd3() * 8) % 2;
     }
-
+    // size of shining points
     function radius(d) {
-        return Math.sqrt(d);
+        return Math.sqrt(d/10);
     }
 
     function contain(d, pos) {
@@ -1152,7 +1152,7 @@ var ONE_SECOND = 1000,
                     bufCtx.restore();
                 }
 
-                s = radius(nr(d)) * (setting.showHalo ? 8 : 1);
+                s = radius(nr(d)) * (setting.showHalo ? 4 : 1);
                 setting.showHalo
                         ? bufCtx.drawImage(img, x - s / 2, y - s / 2, s, s)
                         : bufCtx.arc(x, y, s, 0, PI_CIRCLE, true)
@@ -1286,7 +1286,7 @@ var ONE_SECOND = 1000,
                         blink(d, !d.links && setting.parentLife > 0);
                         if (d.visible && d.links === 0 && setting.parentLife > 0) {
                             d.flash = 0;
-                            d.alive = d.alive / 10;
+                            d.alive = d.alive / 20;
                         }
                         return d.visible;
                     })
@@ -1639,13 +1639,13 @@ var ONE_SECOND = 1000,
                     d.nodeValue.procurement.category,
                     "</b><hr/>Region: <b>",
                     d.nodeValue.Region,
-                    "</b><br/>Supplier: <b>",
+                    "</b><br/>Send area: <b>",
                     d.nodeValue.supplier.name,
-                    "</b><br/>Borrower: <b>",
+                    "</b><br/>Receive area: <b>",
                     d.nodeValue.borrower.name,
-                    "</b><br/>Received ($): <b>",
+                    "</b><br/>Deliver Time: <b>",
                     th(+d.nodeValue),
-                    "M.</b><br/>"
+                    "h.</b><br/>"
                 ];
             }
 
@@ -2035,7 +2035,7 @@ var ONE_SECOND = 1000,
     function initItem(d) {
         console.log(d);
         // Convert strings to numbers.
-        d.value = d.basevalue = parseInt(d["Deliver time"].substring(1));
+        d.value = d.basevalue = parseInt(d["Deliver time"]);
         d.valueOf = value;
 
         d.borrower = initCounty(d["receive area code"], d["receive area"]);

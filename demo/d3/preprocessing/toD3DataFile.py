@@ -33,8 +33,8 @@ for l in data_file:
     line_ls[15] = ''
     line_ls[16] = line[7]
     line_ls[17] = line[6]
-    line_ls[18] = str(math.ceil((date_receive - date_send).total_seconds()/24/60/60))
+    line_ls[18] = str(math.ceil((date_receive - date_send).total_seconds()/60/60))
     line_ls[19] = ''
     data.append(line_ls)
 with open('D3Data.js', 'w') as f:
-    json.dump({'data': data}, f)
+    f.write('var data_2013=' + json.dumps({'data': data}) +';')

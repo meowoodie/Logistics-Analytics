@@ -69,6 +69,7 @@ world_countries = {
     "features":data2
 }
 with open("wbc2.js", "w") as f:
-    json.dump(wbc, f)
+    f.write('var wbc = '+json.dumps(wbc)+';')
+
 with open("world-countries2.js", 'w') as f:
-    json.dump(world_countries, f)
+    f.write('var wbc = '+json.dumps(world_countries)+';')
