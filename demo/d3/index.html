@@ -342,7 +342,8 @@
 })(window);
 
 var vis = {},
-    cat = 'Send Industry'
+    // cat = 'Send Industry'
+    cat = 'send area'
     ;
 
 var setting = {
@@ -1616,8 +1617,8 @@ var ONE_SECOND = 1000,
                     "</b><hr/>Project: <b>",
                     "(", d.nodeValue.project.id, ") ",
                     d.nodeValue.project.name,
-                    "</b><br/>Product line: <b",
-                    cat == "Product line" ? ' style="text-shadow: 0 0 2px rgba(0, 0, 0, .8);color:' + extColor(d.nodeValue[cat]) + '"' : "",
+                    "</b><br/>City: <b",
+                    cat == "City" ? ' style="text-shadow: 0 0 2px rgba(0, 0, 0, .8);color:' + extColor(d.nodeValue[cat]) + '"' : "",
                     ">",
                     d.nodeValue.product,
                     "</b><br/>sent Industry: <b",
@@ -2264,7 +2265,7 @@ var ONE_SECOND = 1000,
         .selectAll('option')
         .data([
             "Send Industry",
-            "Procurement Category",
+            "send area",
             "Procurement Method",
             "Procurement Type",
             "Product line"
