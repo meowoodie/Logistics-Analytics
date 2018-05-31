@@ -53,6 +53,12 @@
     height: 100%;
 }
 
+#Down_checkbox_text{
+  color: blue;
+}
+#Up_checkbox_text{
+  color: red;
+}
 /* #area, #areaAllCheckBox{
   display:inline;
 } */

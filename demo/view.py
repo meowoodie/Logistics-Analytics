@@ -67,6 +67,7 @@ def similar_companies():
         up_scores   = res["up_scores"]
         down_ids    = res["down_ids"]
         down_scores = res["down_scores"]
+        matched_items["target"] = company_id_handler.get("company_id", [company_id])
         if up_stream:
             unsorted_items = company_id_handler.get("company_id", up_ids)
             # unsorted_items = [ item for item in unsorted_items if item["area_code"] in areas ]

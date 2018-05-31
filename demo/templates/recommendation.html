@@ -102,8 +102,12 @@
 															<div class  ="col-md-12">
 														<h5 class="card-title">控制面板</h5>
 														<div class="checkbox">
-															<label class="checkbox-inline"><input id="Down_checkbox" type="checkbox" value="Down" onclick = "DU_checkbox_click()">推荐下游</label>
-															<label class="checkbox-inline"><input id="Up_checkbox" type="checkbox" value="Up" onclick = "DU_checkbox_click()">推荐上游</label>
+															<label class="checkbox-inline" id='Down_checkbox_text' ><input id="Down_checkbox" type="checkbox" value="Down" onclick = "DU_checkbox_click()">
+																	推荐下游
+															</label>
+															<label class="checkbox-inline"id='Up_checkbox_text'><input id="Up_checkbox" type="checkbox" value="Up" onclick = "DU_checkbox_click()">
+																推荐上游
+															</label>
 														</div>
 														<form>
 															<div class="form-group label-floating">
@@ -361,14 +365,14 @@
 		};
 		function setCenter(num, type){
 			var center;
-			console.log(colorPointsDownStream);
+			// console.log(colorPointsDownStream);
 			if (type==1){
 				center = colorPointsDownStream[num];
 			}else{
 				center = colorPointsUpStream[num];
 			}
 			maps.reCenter(center['position']);
-			console.log(center['position']);
+			// console.log(center['position']);
 		};
 
 		var colorPointsUpStream   = new Array();
@@ -394,21 +398,52 @@
 				recNum: Rec_n.value,
 				areas: areaList
 			};
-			console.log(para);
+			// console.log(para);
 			requestBackEnd(para,"/similarCompanies").then(function(Rec_info){
 				if (queryMarkers != null) {
 					maps.clearMarkers(queryMarkers);
 					queryMarkers = null;
 					colorPointsUpStream   = new Array();
 					colorPointsDownStream = new Array();
+					colorPointTarget = new Array();
 				}
+				console.log(Rec_info['target']);
+        colorPointTarget =  _.map(Rec_info['target'], function(info, rank){
+					// TODO: a patch for fixing wrong location info for Xi'an City
+					if (info['area_code'] == "029Y"){
+						info['lat'] = 34.3416;
+						info['lng'] = 108.9398;
+					}
+					if (info['area_code'] == "760Y"){
+						info['lat'] = 22.5176;
+						info['lng'] = 113.3928;
+					}
+					if (info['area_code'] == "024Y"){
+						info['lat'] = 41.8057;
+						info['lng'] = 123.4315;
+					}
+					return{
+						position: {'lat': info['lat'], 'lng': info['lng']},
+						color: "yellow",
+						id: info["company_id"],
+						mb: info['main_business'],
+						os: info['is_oversea'],
+						ind1: info['industry_lv1'],
+						ind2: info['industry_lv2'],
+						ind3: info['industry_lv3'],
+						city: info['city'],
+						coop_m: info['coop_month'],
+						relation: 'Target'
+					}
+				});
+
 				document.getElementById("downShowWin").innerHTML = "(空)";
 				document.getElementById("upShowWin").innerHTML = "(空)";
 				var downStream = document.getElementById("Down_checkbox"),
 						upStream   = document.getElementById("Up_checkbox");
 				if (downStream.checked == true){
 					showRecList(Rec_info['downs'],'down');
-					console.log(Rec_info);
+					// console.log(Rec_info);
 					weight = _.map(Rec_info['downs'], function(info, companyID){
 						return(info['score'])
 					});
@@ -486,7 +521,8 @@
 					});
 				}
 				var colorPoints = colorPointsUpStream.concat(colorPointsDownStream);
-				console.log(colorPoints);
+				colorPoints = colorPoints.concat(colorPointTarget);
+				// console.log(colorPoints);
 				queryMarkers = maps.createRecommendedMarkers(colorPoints,[]);
 				// console.log(queryMarkers);
 				maps.fitBound(queryMarkers);

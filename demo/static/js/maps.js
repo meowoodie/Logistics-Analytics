@@ -52,35 +52,68 @@ maps = {
 
     createRecommendedMarkers: function(points, lines){
       return _.map(points, function(point){
-        var marker = new google.maps.Marker({
-          position: point["position"],
-          map: mapObj,
-          icon:{
-            path: google.maps.SymbolPath.CIRCLE,
-            fillOpacity: 0.7,
-            fillColor: point["color"],
-            strokeOpacity: 1.0,
-            strokeColor: point["color"],
-            strokeWeight: 1.0,
-            scale: (point["weight"]+0.5) * 10
-          }
-        });
-        // add addListener
-        var infoWindowHtml = String.format('\
-            <div class="content" style="height:100%">\
-                <div class="row">\
-                  <div class = "col-md-8 col-lg-offset-2">\
-                        <div class="row"><p class="card-text">公司 ID: {0}</p></div>\
-                        <div class="row"><p class="card-text">主营业务: {1}</p></div>\
-                        <div class="row"><p class="card-text">行业类型_lv1: {2}</p></div>\
-                        <div class="row"><p class="card-text">城市: {3}</p></div>\
-                        <div class="row"><p class="card-text">排名: {4}({6})</p></div>\
-                        <div class="row"><p class="card-text">分数: {5}</p></div>\
+        if (point["color"] == 'yellow'){
+          var marker = new google.maps.Marker({
+            position: point["position"],
+            map: mapObj,
+            icon:{
+              path: 'M 125,5 155,90 245,90 175,145 200,230 125,180 50,230 75,145 5,90 95,90 z',
+              fillOpacity: 0.7,
+              fillColor: point["color"],
+              strokeOpacity: 1.0,
+              strokeColor: 'gold',
+              strokeWeight: 1.0,
+              scale: 0.1
+            }
+          });
+          // add addListener
+          var infoWindowHtml = String.format('\
+              <div class="content" style="height:100%">\
+                  <div class="row">\
+                    <div class = "col-md-8 col-lg-offset-2">\
+                          <div class="row"><p class="card-text">公司 ID: {0}</p></div>\
+                          <div class="row"><p class="card-text">主营业务: {1}</p></div>\
+                          <div class="row"><p class="card-text">行业类型_lv1: {2}</p></div>\
+                          <div class="row"><p class="card-text">城市: {3}</p></div>\
+                    </div>\
                   </div>\
-                </div>\
-            </div>',
-            point["id"], point["mb"], point["ind1"], point["city"], point['rank'], point["score"], point["relation"]=="Down Stream"?"下游推荐":"上游推荐");
-        createInfoWindow(marker, infoWindowHtml);
+              </div>',
+              point["id"], point["mb"], point["ind1"], point["city"]);
+          createInfoWindow(marker, infoWindowHtml);
+
+        } else{
+
+          var marker = new google.maps.Marker({
+            position: point["position"],
+            map: mapObj,
+            icon:{
+              path: google.maps.SymbolPath.CIRCLE,
+              fillOpacity: 0.7,
+              fillColor: point["color"],
+              strokeOpacity: 1.0,
+              strokeColor: point["color"],
+              strokeWeight: 1.0,
+              scale: (point["weight"]+0.5) * 10
+            }
+          });
+          // add addListener
+          var infoWindowHtml = String.format('\
+              <div class="content" style="height:100%">\
+                  <div class="row">\
+                    <div class = "col-md-8 col-lg-offset-2">\
+                          <div class="row"><p class="card-text">公司 ID: {0}</p></div>\
+                          <div class="row"><p class="card-text">主营业务: {1}</p></div>\
+                          <div class="row"><p class="card-text">行业类型_lv1: {2}</p></div>\
+                          <div class="row"><p class="card-text">城市: {3}</p></div>\
+                          <div class="row"><p class="card-text">排名: {4}({6})</p></div>\
+                          <div class="row"><p class="card-text">分数: {5}</p></div>\
+                    </div>\
+                  </div>\
+              </div>',
+              point["id"], point["mb"], point["ind1"], point["city"], point['rank'], point["score"], point["relation"]=="Down Stream"?"下游推荐":"上游推荐");
+          createInfoWindow(marker, infoWindowHtml);
+
+        }
         return marker;
       })
     },
