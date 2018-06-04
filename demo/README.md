@@ -1,11 +1,11 @@
 Recommendation System for SF clients relationship
 ===
 
-### Introduction
+### § Introduction
 
 A recommendation system demo for SF clients (companies) based on potential business connection. This project is a web based service built on a Python microframework `Flask`, which connects to our core recommendation algorithm.
 
-### Architecture
+### § Architecture
 
 Below is an illustration for the project architecture.
 
@@ -21,16 +21,18 @@ Basically, the entire project includes three key components:
 
 For now, the database service is a simple MySQL database with a `Loopback` database wrapper that provides high-level data model API. And frontend is a simple html template that provides interactive Map visualization (Google Map), statistical graphs and so on. Both of these two services are highly replaceable.
 
-### Deployment
+### § Deployment
 
-##### Install Python denpendencies
+##### ¶ Install Python denpendencies
 
-To install required Python dependencies, run following commands:
+To install required Python dependencies (including algorithm module), run following commands:
 ```
 python -r requirements.txt
 ```
 
-##### Start MySQL database service
+> TODO: modularization of our algorithm module (Python package) 
+
+##### ¶ Start MySQL database service
 
 1. Start database
 ```
@@ -100,7 +102,7 @@ And an example of data model configuration for `company info` is shown as below:
 }
 ```
 
-##### System boot
+##### ¶ System boot
 To boot the system, run the following commands in order to start `Flask` service:
 
 ```
