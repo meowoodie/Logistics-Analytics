@@ -3,7 +3,7 @@ Recommendation System for SF clients relationship
 
 ### § Introduction
 
-A recommendation system demo for SF clients (companies) based on potential business connection. This project is a web based service built on a Python microframework (Flask)[http://flask.pocoo.org/], which connects to our core recommendation algorithm.
+A recommendation system demo for SF clients (companies) based on potential business connection. This project is a web based service built on a Python microframework [Flask](http://flask.pocoo.org/), which connects to our core recommendation algorithm.
 
 ### § Architecture
 
@@ -19,7 +19,7 @@ Basically, the entire project includes three key components:
 - **Web Service** (Backend API Provider): A `Flask` project providing a simple web container which is able to retrieve data from database service, get results from algorithm module and rendering visualization results to the frontend.
 - **Frontend**: Webpage, Mobile Application (IOS/Android/...) and so on.
 
-For now, the database service is a simple MySQL database with a (Loopback)[https://loopback.io/] database wrapper that provides high-level data model API. And frontend is a simple html template that provides interactive Map visualization (Google Map), statistical graphs and so on. Both of these two services are highly replaceable.
+For now, the database service is a simple MySQL database with a [Loopback](https://loopback.io/) database wrapper that provides high-level data model API. And frontend is a simple html template that provides interactive Map visualization (Google Map), statistical graphs and so on. Both of these two services are highly replaceable.
 
 ### § Deployment
 
@@ -114,4 +114,4 @@ In the end, open the url (here is http://your_ip_address:5000/) in the browser t
 
 #### Frontend
 
-In our application, the frontend is presented in the form of a webpage, which requires some of third-party denpendencies, including (Google Map API)[https://cloud.google.com/maps-platform/] service, (Material Design CSS)[https://materializecss.com/], (Blue Bird)[http://bluebirdjs.com/docs/getting-started.html] (for asynchronous promise) (Chart JS)[http://www.chartjs.org/docs/latest/], (UnderscoreJS)[http://underscorejs.org/] (for basic data operation) and so on.
+In our application, the frontend is presented in the form of a webpage, which requires some of third-party denpendencies, including [Google Map API](https://cloud.google.com/maps-platform/) service, [Material Design CSS](https://materializecss.com/), [Blue Bird](http://bluebirdjs.com/docs/getting-started.html) (for asynchronous promise) [Chart JS](http://www.chartjs.org/docs/latest/), [UnderscoreJS](http://underscorejs.org/) (for basic data operation) and so on.
