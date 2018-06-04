@@ -9,7 +9,7 @@ A recommendation system demo for SF clients (companies) based on potential busin
 
 Below is an illustration for the project architecture.
 
-![service folder structure]()
+![service folder structure](https://github.com/meowoodie/sparkling-logistics/blob/master/demo/imgs/architecture.png)
 
 Basically, the entire project includes three key components:
 
