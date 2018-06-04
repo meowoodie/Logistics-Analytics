@@ -45,6 +45,61 @@ The wrapper is for providing user-friendly data access layer. In our application
 
 Prior to running the wrapper, associated configurations are required, specifically including: `server/datasources.json`, `server/model-config.json` (for connecting indicated database) and `common\/models/*.js`, `common\/models/*.json` (for defining data models).
 
+In order to connect a `MySQL` database, an example json file is going to be configured as follow:
+```json
+"sfexpress_ds": {
+    "host": "localhost",
+    "port": 3306,
+    "url": "mysql://root:pwd@localhost/sfexpress",
+    "database": "sfexpress",
+    "password": "pwd",
+    "name": "sfexpress_ds",
+    "user": "root",
+    "connector": "mysql"
+}
+```
+And an example of data model configuration for `company info` is shown as below:
+```json
+{
+  "name": "company_info",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "id": true,
+      "required": true
+    },
+    "lat": {
+      "type": "float"
+    },
+    "lng": {
+      "type": "float"
+    },
+    "main_business" : {
+      "type": "string"
+    },
+    "is_oversea" : {
+      "type": "string"
+    },
+    "industry_lv1": {"type": "string"},
+    "industry_lv2": {"type": "string"},
+    "industry_lv3": {"type": "string"},
+    "area_code": {"type": "string"},
+    "area_desc": {"type": "string"},
+    "city": {"type": "string"},
+    "coop_month" : {"type": "int"}
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
+```
+
 ##### System boot
 To boot the system, run the following commands in order to start `Flask` service:
 
@@ -53,7 +108,7 @@ FLASK_APP=view.py
 python -m flask run
 ```
 
-Finally, open the url (here is http://your_ip_address:5000/ ) in the browser to visit the webpage.
+Finally, open the url (here is http://your_ip_address:5000/) in the browser to visit the webpage.
 
 ### Components
 
