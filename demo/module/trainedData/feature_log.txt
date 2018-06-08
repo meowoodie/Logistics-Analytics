@@ -1,0 +1,6 @@
+Produced by feature.py
+See whether there is bug in dayaverage and variation.
+Feature vectors should be fine.
+Use A_s instead of A
+Code starts at: 2018-06-08T11:03:13.041868+08:00
+Code ends at: 2018-06-08T11:04:12.624917+08:00
