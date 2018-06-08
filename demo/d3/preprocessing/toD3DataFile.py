@@ -37,4 +37,4 @@ for l in data_file:
     line_ls[19] = ''
     data.append(line_ls)
 with open('D3Data.js', 'w') as f:
-    f.write('var data_2013=' + json.dumps({'data': data}) +';')
+    f.write('var data_2017=' + json.dumps({'data': data}) +';')
