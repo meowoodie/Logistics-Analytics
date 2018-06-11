@@ -395,7 +395,7 @@ var shortTimeFormat = (function() {
 })();
 
 var ONE_SECOND = 1000,
-    stepDate = 5* 60* 60*1000//24 * 60 * 60 * 1000 one day
+    stepDate = 4* 60* 60*1000//24 * 60 * 60 * 1000 one day
 ;
 
 (function(vis) {
@@ -429,8 +429,8 @@ var ONE_SECOND = 1000,
         links,
         regionLinks,
 
-        lCom, lLeg, lHis,
-
+        lCom, lLeg, lHis, lLeg2, Reg2R, // TODO: check how to define dictionary like object
+        currentDate, todayCount,
         canvas, ctx,
         bufCanvas, bufCtx,
         layer,
@@ -472,12 +472,23 @@ var ONE_SECOND = 1000,
 
 
     function reCalc(d) {
-        console.log(d)
+        // console.log(d)
         if (stop)
             return;
 
         lCom.showMessage(d.supplier.shortName + ' to ' + d.borrower.shortName + ' -> ' + d.project.name);
+        if((d.parent ==d.borrower) && (todayCount.indexOf(d.id)==-1)){
+          if ([d.supplier.shortName, d.borrower.shortName] in Reg2R){
+            Reg2R[[d.supplier.shortName , d.borrower.shortName]] +=1;
+          }else{
+            Reg2R[[d.supplier.shortName ,d.borrower.shortName]] =1;
+          }
+          todayCount.push(d.id);
 
+        }
+        console.log(Reg2R);
+        console.log(todayCount.length);
+        console.log('hi');
         var l = d.nodes.length,
                 n, a, fn;
 
@@ -486,7 +497,8 @@ var ONE_SECOND = 1000,
         a.fixed = a.x instanceof Object || a.y instanceof Object ? true : false;
 
         if (!l)
-            console.log(d);
+            // console.log(d);
+            console.log('hi');
         else {
             a.alive = setting.parentLife > 0 ? setting.parentLife : 1;
             a.opacity = 100;
@@ -605,11 +617,16 @@ var ONE_SECOND = 1000,
         }
 
         var dl, dr;
-
+        console.log(_data[13])
+        console.log(_data[14]);
+        console.log(_data[15]);
         dl = dateRange[0];
         dr = dl + stepDate;
         dateRange[0] = dr;
-
+        if (shortTimeFormat(dl)!= currentDate){
+          currentDate = shortTimeFormat(dl);
+          todayCount = []; // TODO: how to define set?
+        }
         appendExtLegend(shortTimeFormat(dr));
 
         var visTurn = _data.filter(function (d) {
@@ -1492,9 +1509,9 @@ var ONE_SECOND = 1000,
         if (!layer)
             return;
 
-        var mt = 48,
-            ml = 5,//_w * .01,
-            h2 = _h / 2 - mt,
+        var mt = 48, //margin top
+            ml = 5,//_w * .01, margin left
+            h2 = _h / 6 - mt,  // legend height
             w3 = _w / 3
             ;
 
@@ -1711,8 +1728,20 @@ var ONE_SECOND = 1000,
     vis.runShow = function(data, dom, w, h, asetting) {
         if (typeof _worker !== "undefined")
             clearTimeout(_worker);
-
-        _data = data.sort(function(a, b) { return d3.ascending(a, b) });
+        console.log(data[0]);
+        console.log(data[1]);
+        console.log(data[2]);
+        _data = data.sort(function(a, b) {
+            if (a.id == b.id )
+              return d3.ascending(a, b);
+            else{
+              return d3.ascending(a.contract.date, b.contract.date);
+            }
+          }); // sort d3.ascending(a.contract.date, b.contract.date)
+        // TODO: check d3.ascending
+        // console.log(_data[0]);
+        // console.log(_data[3999]);
+        // console.log('hi');
         _w = w;
         _h = h;
 
@@ -1728,7 +1757,8 @@ var ONE_SECOND = 1000,
         dateRange = d3.extent(data, function(d) {
             return d.date;
         });
-
+        // console.log(dateRange);
+        // console.log('hi');
         layer = dom;
         layer.selectAll("*").remove();
 
@@ -1778,7 +1808,11 @@ var ONE_SECOND = 1000,
         lHis = null;
         lCom = null;
         lLeg = null;
-
+        lLeg2 = null;
+        Reg2R = {};
+        currentDate = null;
+        todayCount = [];
+        currentDate = currentDate || shortTimeFormat(dateRange[0]);
         layer = d3.select(dom.node().parentNode).append("div").attr("id", "s")
             .append("svg").attr('width', w).attr("height", h);
 
@@ -1802,7 +1836,7 @@ var ONE_SECOND = 1000,
                 )
                 .attr("transform", "translate(" + [w/2, h - 18] + ")")
         ;
-        lCom.visible = !setting.showMessage;
+        lCom.visible = !setting.showMessage;                          // show message, from one place to another
 
         lCom.selectAll("text").remove();
         lCom.showMessage = lCom.showMessage || function(text) {
@@ -2035,7 +2069,6 @@ var ONE_SECOND = 1000,
     }
 
     function initItem(d) {
-        console.log(d);
         // Convert strings to numbers.
         d.value = d.basevalue = parseInt(d["Deliver time"]);
         d.valueOf = value;
@@ -2054,6 +2087,8 @@ var ONE_SECOND = 1000,
         d.date = d.contract.date;
         d.asdate = Date.parse(d['As of Date']);
 
+        // console.log(d);
+        // console.log('init');
         return d;
     }
 
@@ -2104,9 +2139,7 @@ var ONE_SECOND = 1000,
 
     function request(data) {
         var l, a, b;
-        // console.log(data);
         data = _.map(data, function(d) { return _.object(attr_list, d); });
-        // console.log(data);
         projects = {};
         countriesCounter = 0;
         countries = {};
@@ -2126,17 +2159,21 @@ var ONE_SECOND = 1000,
             a.parent = a.supplier;
             b.parent = b.borrower;
             a.date = a.date - stepDate /*/2*/;
-            _data.push(a);
+            // _data.push(a);
             _data.push(b);
         }
+        // console.log(_data[0]);
+        // console.log(_data);
         _data.sort(sortByCSD);
-
+        // console.log(_data);
+        // console.log(_data[0]);
+        // console.log('hi');
         div = div || d3.select(document.body).append("div").attr("id", "c");
         w = document.body.clientWidth;
         h = document.body.clientHeight;
 
         projection
-            .scale(w/6.5)
+            .scale(w/6.5)                           // control zoom in
             .translate([w / 2, h / 1.6])
         ;
 
@@ -2161,7 +2198,7 @@ var ONE_SECOND = 1000,
             d3.select(document.body)
                 .append("div")
                 .attr("id", "pb")
-                .style("height", "18px")
+                .style("height", "18px")           // height, not length of height
                 .append("svg")
                 .attr("width", w)
                 .attr("height", 18)
@@ -2313,7 +2350,7 @@ var ONE_SECOND = 1000,
             .enter().append("path")
             .attr("class", "feature")
         ;
-        console.log(feature);
+        // console.log(feature);
 
 
         // d3.csv(fy + '.csv', request);
