@@ -429,7 +429,8 @@ var ONE_SECOND = 1000,
         links,
         regionLinks,
 
-        lCom, lLeg, lHis, lLeg2, Reg2R, // TODO: check how to define dictionary like object
+        lCom, lLeg, lHis,
+        lLeg2, Reg2R, lCount,// TODO: check how to define dictionary like object
         currentDate, todayCount,
         canvas, ctx,
         bufCanvas, bufCtx,
@@ -486,6 +487,7 @@ var ONE_SECOND = 1000,
           todayCount.push(d.id);
 
         }
+        updateTodayCount();
         console.log(Reg2R);
         console.log(todayCount.length);
         console.log('hi');
@@ -1505,13 +1507,49 @@ var ONE_SECOND = 1000,
                 : d.value.color;
     }
 
+    function initTodayCount(){
+      if (!layer)
+        return;
+      console.log('1');
+      var mt = 60,
+          ml = 5,
+          h2 = _h / 6 - mt,
+          w3 = _w/3
+          ;
+          lCount = (lCount || layer.append("text"))
+              .attr("class", "todayCount")
+              .attr("fill", "white")
+              .attr("transform", "translate(" + [ml, mt] + ")");
+
+          lCount.selectAll("*").remove();
+
+          lCount.append("tspan")
+          .attr("dy","0")
+          .attr("x", "5")
+          .text('今日寄件量');
+          lCount.append("tspan")
+          .attr("class", "todayCountData")
+          .attr("fill", "white")
+          .attr('dy', '1em')
+          .attr("x", "5")
+          // .attr("transform", "translate("+[ml, mt+10]+")")
+          .text(currentDate +" "+todayCount.length);
+    }
+
+    function updateTodayCount(){
+      if (!lLeg || lLeg.empty())
+          return;
+      var ele = lCount.select(".todayCountData");
+      ele.text(currentDate+" "+todayCount.length);
+    }
+
     function initLegend() {
         if (!layer)
             return;
 
-        var mt = 48, //margin top
+        var mt = 48 + 48, //margin top
             ml = 5,//_w * .01, margin left
-            h2 = _h / 6 - mt,  // legend height
+            h2 = _h / 3 - mt,  // legend height
             w3 = _w / 3
             ;
 
@@ -1809,6 +1847,7 @@ var ONE_SECOND = 1000,
         lCom = null;
         lLeg = null;
         lLeg2 = null;
+        lCount = null;
         Reg2R = {};
         currentDate = null;
         todayCount = [];
@@ -1913,7 +1952,7 @@ var ONE_SECOND = 1000,
         ;
 
         initLegend();
-
+        initTodayCount();
         stop = false;
         pause = false;
 
