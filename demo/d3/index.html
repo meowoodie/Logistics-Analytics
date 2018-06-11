@@ -431,7 +431,7 @@ var ONE_SECOND = 1000,
 
         lCom, lLeg, lHis,
         lLeg2, Reg2R, lCount,// TODO: check how to define dictionary like object
-        currentDate, todayCount,
+        currentDate, todayCount, sendInCount, recInCount, tableSend, tableReg, lDom, domInter,
         canvas, ctx,
         bufCanvas, bufCtx,
         layer,
@@ -484,13 +484,28 @@ var ONE_SECOND = 1000,
           }else{
             Reg2R[[d.supplier.shortName ,d.borrower.shortName]] =1;
           }
+
+          if (d.sector in sendInCount){
+            sendInCount[d.sector] += 1;
+          }else{
+            sendInCount[d.sector] = 1;
+          }
+
+          if  (("ABCDEFGHIJKLMNOPQRSTUVWXYZ").indexOf(d.supplier.name[0])>-1){
+            domInter[1]+=1;
+            // console.log(d.supplier.name);
+          }else{
+            domInter[0]+=1;
+          };
           todayCount.push(d.id);
 
         }
         updateTodayCount();
-        console.log(Reg2R);
-        console.log(todayCount.length);
-        console.log('hi');
+        updateTableSend();
+        updateTableReg();
+        updateSendDom();
+        // console.log(sendInCount);
+        // console.log('hi');
         var l = d.nodes.length,
                 n, a, fn;
 
@@ -499,8 +514,8 @@ var ONE_SECOND = 1000,
         a.fixed = a.x instanceof Object || a.y instanceof Object ? true : false;
 
         if (!l)
-            // console.log(d);
-            console.log('hi');
+            console.log(d);
+            // console.log('hi');
         else {
             a.alive = setting.parentLife > 0 ? setting.parentLife : 1;
             a.opacity = 100;
@@ -536,9 +551,10 @@ var ONE_SECOND = 1000,
             n.flash = 100;
             n.opacity = 100;
             n.alive = setting.childLife > 0 ? setting.childLife : 1;
-
+            console.log(n);
+            console.log("here3");
             if (n.visible) {
-                n.ext.now.indexOf(fn) < 0
+                (n.ext.now.indexOf(fn) < 0) // TODO:
                 && n.ext.now.push(fn);
             }
             else {
@@ -619,9 +635,9 @@ var ONE_SECOND = 1000,
         }
 
         var dl, dr;
-        console.log(_data[13])
-        console.log(_data[14]);
-        console.log(_data[15]);
+        // console.log(_data[13])
+        // console.log(_data[14]);
+        // console.log(_data[15]);
         dl = dateRange[0];
         dr = dl + stepDate;
         dateRange[0] = dr;
@@ -1416,6 +1432,8 @@ var ONE_SECOND = 1000,
             return;
 
         ny = h2;
+        console.log(extHash);
+        console.log("here2");
         extHash.forEach(function(k, d) {
             var obj = {
                 key : k,
@@ -1432,7 +1450,8 @@ var ONE_SECOND = 1000,
             .attr("class", "colStack")
             .datum({ x : 0, max : w3, w : bw })
             .style("opacity", 0);
-
+        console.log(data);
+        console.log("here");
         g.selectAll("rect")
             .data(data)
             .enter()
@@ -1481,12 +1500,22 @@ var ONE_SECOND = 1000,
         ].join(''));
         tooltip.style("display", "block");
         updateLegend();
+
+        updateTodayCount();
+        updateTableSend();
+        updateTableReg();
+        updateSendDom();
     }
 
     function lml() {
         selectedExt = null;
         tooltip.style("display", null);
         updateLegend();
+
+        updateTodayCount();
+        updateTableSend();
+        updateTableReg();
+        updateSendDom();
     }
 
     function lmm(d) {
@@ -1507,10 +1536,45 @@ var ONE_SECOND = 1000,
                 : d.value.color;
     }
 
+    function initSendDom(){
+      if (!layer)
+        return;
+      var mt = 100,
+          ml = 5,
+          h2 = _h /4,
+          w3 = _w/3
+          ;
+      lDom = (lDom || layer.append("text"))
+            .attr("class", "domesticCount")
+            .attr("fill", "white")
+            .attr("transform", "translate(" + [ml, mt] + ")");
+      lDom.selectAll("*").remove();
+      lDom.append("tspan")
+      .attr("dy", "0")
+      .attr("x", "5")
+      .text("国内寄件比例")
+      .style("font-size", "13px");
+      lDom.append("tspan")
+      .attr("class", "domesticCountData")
+      .attr("fill", "white")
+      .attr("dy", "1em")
+      .attr("x", "5")
+      .text("100%")
+      .style("font-size", "11px");
+
+    }
+
+    function updateSendDom(){
+      if (!lLeg || lLeg.empty())
+          return;
+      var ele = lDom.select(".domesticCountData");
+      ele.text((domInter[0]/(domInter[0]+ domInter[1])*100).toFixed(1)+"%");
+
+    }
+
     function initTodayCount(){
       if (!layer)
         return;
-      console.log('1');
       var mt = 60,
           ml = 5,
           h2 = _h / 6 - mt,
@@ -1526,30 +1590,155 @@ var ONE_SECOND = 1000,
           lCount.append("tspan")
           .attr("dy","0")
           .attr("x", "5")
-          .text('今日寄件量');
+          .text('今日寄件量')
+          .style("font-size", "13px");
           lCount.append("tspan")
           .attr("class", "todayCountData")
           .attr("fill", "white")
           .attr('dy', '1em')
           .attr("x", "5")
           // .attr("transform", "translate("+[ml, mt+10]+")")
-          .text(currentDate +" "+todayCount.length);
+          .text(currentDate +": "+todayCount.length)
+          .style("font-size", "11px");
     }
 
     function updateTodayCount(){
       if (!lLeg || lLeg.empty())
           return;
       var ele = lCount.select(".todayCountData");
-      ele.text(currentDate+" "+todayCount.length);
+      ele.text(currentDate+": "+todayCount.length);
     }
 
+    function initTableSend(){
+      if (!layer)
+        return;
+      // console.log('1');
+      var mt = 48,
+          ml = 200,
+          h2 = _h / 2 - mt,
+          w3 = _w/3,
+          thead = null,
+          tbody = null
+          ;
+          tableSend = (tableSend || layer.append("foreignObject"))
+              .attr("width", w3)
+              .attr("height", h2)
+              .attr("transform", "translate(" + [ml, mt] + ")")
+              .append("xhtml:text")
+              .append("table")
+              .attr("class", "tableSend")
+              .attr("style", "color: white");
+              // append the header row
+          thead = tableSend.append('thead');
+          tableSend.append('tbody').attr("class", "tableBody");
+      		thead.append('tr')
+      		  .selectAll('th')
+      		  .data(["寄件行业", "寄件量"]).enter()
+      		  .append('th')
+      		    .text(function (column) { return column; })
+              .style("font-size", "13px")
+              .style("opacity", 0.7);
+
+    }
+
+    function updateTableSend(){
+      // console.log('1111');
+      var tbody = tableSend.select('.tableBody');
+      tbody.selectAll("*").remove();
+      var dataSend = new Array;
+      for (var key in sendInCount){
+        dataSend.push({"寄件行业": key, "寄件量":sendInCount[key]})
+      }
+      dataSend.sort(function(a, b){ return b["寄件量"] - a["寄件量"]});
+      // console.log(dataSend);
+
+  		// create a row for each object in the data
+  		var rows = tbody.selectAll('tr')
+  		  .data(dataSend.length>5 ? dataSend.slice(0,5) : dataSend)
+  		  .enter()
+  		  .append('tr');
+  		// create a cell in each row for each column
+      var columns = ["寄件行业","寄件量"];
+  		var cells = rows.selectAll('td')
+  		  .data(function (row) {
+  		    return columns.map(function (column) {
+  		      return {column: column, value: row[column]};
+  		    });
+  		  })
+  		  .enter()
+  		  .append('td')
+  		    .text(function (d) { return d.value; })
+          .style("font-size", "11px")
+          .style("opacity", 0.7);;
+    }
+
+
+    function initTableReg(){
+      if (!layer)
+        return;
+      // console.log('1');
+      var mt = _h/4 - 50,
+          ml = 200,
+          h2 = _h /4 - 48,
+          w3 = _w/3,
+          thead = null,
+          tbody = null
+          ;
+          tableReg = (tableReg || layer.append("foreignObject"))
+              .attr("width", w3)
+              .attr("height", h2)
+              .attr("transform", "translate(" + [ml, mt] + ")")
+              .append("xhtml:text")
+              .append("table")
+              .attr("class", "tableReg")
+              .attr("style", "color: white");
+              // append the header row
+          thead = tableReg.append('thead');
+          tableReg.append('tbody').attr("class", "tableBody");
+      		thead.append('tr')
+      		  .selectAll('th')
+      		  .data(["寄件城市","收件城市", "件量"]).enter()
+      		  .append('th')
+      		    .text(function (column) { return column; })
+              .style("font-size", "13px")
+              .style("opacity", 0.7);;
+
+    }
+
+    function updateTableReg(){
+      var tbody = tableReg.select('.tableBody');
+      tbody.selectAll("*").remove();
+      var dataReg = new Array;
+      for (var key in Reg2R){
+        dataReg.push({"寄件区域": key.split(",")[0], "收件区域": key.split(",")[1],"件量":Reg2R[key]})
+      }
+      dataReg.sort(function(a, b){ return b["件量"] - a["件量"]});
+  		// create a row for each object in the data
+  		var rows = tbody.selectAll('tr')
+  		  .data(dataReg.length>5 ? dataReg.slice(0,5) : dataReg)
+  		  .enter()
+  		  .append('tr');
+  		// create a cell in each row for each column
+      var columns = ["寄件区域","收件区域","件量"];
+  		var cells = rows.selectAll('td')
+  		  .data(function (row) {
+  		    return columns.map(function (column) {
+  		      return {column: column, value: row[column]};
+  		    });
+  		  })
+  		  .enter()
+  		  .append('td')
+  		    .text(function (d) { return d.value; })
+          .style("font-size", "11px")
+          .style("opacity", 0.7);;
+    }
     function initLegend() {
         if (!layer)
             return;
 
-        var mt = 48 + 48, //margin top
+        var mt = 140, //margin top
             ml = 5,//_w * .01, margin left
-            h2 = _h / 3 - mt,  // legend height
+            h2 = _h / 4,  // legend height
             w3 = _w / 3
             ;
 
@@ -1608,6 +1797,7 @@ var ONE_SECOND = 1000,
         var g = lLeg.selectAll(".gLeg");
 
         function wl(d) {
+            //console.log(d.value);
             return d.value.now.length;
         }
 
@@ -1720,6 +1910,11 @@ var ONE_SECOND = 1000,
             ;
         }
         updateLegend();
+
+        updateTodayCount();
+        updateTableSend();
+        updateTableReg();
+        updateSendDom();
     }
 
     function movem(d) {
@@ -1766,9 +1961,6 @@ var ONE_SECOND = 1000,
     vis.runShow = function(data, dom, w, h, asetting) {
         if (typeof _worker !== "undefined")
             clearTimeout(_worker);
-        console.log(data[0]);
-        console.log(data[1]);
-        console.log(data[2]);
         _data = data.sort(function(a, b) {
             if (a.id == b.id )
               return d3.ascending(a, b);
@@ -1848,9 +2040,15 @@ var ONE_SECOND = 1000,
         lLeg = null;
         lLeg2 = null;
         lCount = null;
+        tableSend = null;
+        tableReg = null;
+        lDom = null;
+        domInter = [0,0];
         Reg2R = {};
         currentDate = null;
         todayCount = [];
+        sendInCount = {};
+        recInCount = {};
         currentDate = currentDate || shortTimeFormat(dateRange[0]);
         layer = d3.select(dom.node().parentNode).append("div").attr("id", "s")
             .append("svg").attr('width', w).attr("height", h);
@@ -1953,6 +2151,9 @@ var ONE_SECOND = 1000,
 
         initLegend();
         initTodayCount();
+        initTableSend();
+        initTableReg();
+        initSendDom();
         stop = false;
         pause = false;
 
@@ -2197,13 +2398,15 @@ var ONE_SECOND = 1000,
             b = clone(a);
             a.parent = a.supplier;
             b.parent = b.borrower;
-            a.date = a.date - stepDate /*/2*/;
-            // _data.push(a);
+            // a.date = a.date - stepDate /*/2*/;
+            _data.push(a);
             _data.push(b);
         }
         // console.log(_data[0]);
-        // console.log(_data);
+        console.log(_data);
         _data.sort(sortByCSD);
+        for (var i in _data)
+          // console.log(_data[i].supplier);
         // console.log(_data);
         // console.log(_data[0]);
         // console.log('hi');
@@ -2212,8 +2415,9 @@ var ONE_SECOND = 1000,
         h = document.body.clientHeight;
 
         projection
-            .scale(w/6.5)                           // control zoom in
-            .translate([w / 2, h / 1.6])
+            .scale(w/2.2)                           // control zoom in
+            // .translate([w / 2, h / 1.6])
+            .translate([-400, 1000])
         ;
 
         zoom.translate(projection.translate())
