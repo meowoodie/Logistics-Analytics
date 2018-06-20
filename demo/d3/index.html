@@ -351,7 +351,7 @@ var setting = {
     , parentLife : 0 // number of steps of life a parent
     , showCountExt : true // show table of child's extension
     , onlyShownExt : true // show only extension which is shown
-    , showHistogram : true // displaying histogram of changed files
+    , showHistogram : false // displaying histogram of changed files
     , showHalo : true // show a child's halo
     , padding : 0 // padding around a parent
     , rateOpacity : 1.5 // rate of decrease of opacity
@@ -1627,7 +1627,9 @@ var ONE_SECOND = 1000,
               .append("xhtml:text")
               .append("table")
               .attr("class", "tableSend")
-              .attr("style", "color: white");
+              .attr("style", "color: white")
+              .style("opacity", 0.7);
+          tableSend.append('caption').text('行业累积寄件量').style('font-size', '14px');
               // append the header row
           thead = tableSend.append('thead');
           tableSend.append('tbody').attr("class", "tableBody");
@@ -1636,8 +1638,7 @@ var ONE_SECOND = 1000,
       		  .data(["寄件行业", "寄件量"]).enter()
       		  .append('th')
       		    .text(function (column) { return column; })
-              .style("font-size", "13px")
-              .style("opacity", 0.7);
+              .style("font-size", "13px");
 
     }
 
@@ -1677,7 +1678,7 @@ var ONE_SECOND = 1000,
       if (!layer)
         return;
       // console.log('1');
-      var mt = _h/4 - 50,
+      var mt = _h/4 - 25,
           ml = 200,
           h2 = _h /4 - 48,
           w3 = _w/3,
@@ -1691,8 +1692,10 @@ var ONE_SECOND = 1000,
               .append("xhtml:text")
               .append("table")
               .attr("class", "tableReg")
-              .attr("style", "color: white");
+              .attr("style", "color: white")
+              .style("opacity", 0.7);
               // append the header row
+          tableReg.append('caption').text('城市间累积寄件量').style('font-size', '14px');
           thead = tableReg.append('thead');
           tableReg.append('tbody').attr("class", "tableBody");
       		thead.append('tr')
@@ -1700,8 +1703,7 @@ var ONE_SECOND = 1000,
       		  .data(["寄件城市","收件城市", "件量"]).enter()
       		  .append('th')
       		    .text(function (column) { return column; })
-              .style("font-size", "13px")
-              .style("opacity", 0.7);;
+              .style("font-size", "13px");
 
     }
 
@@ -2462,7 +2464,8 @@ var ONE_SECOND = 1000,
     }
 
     d3.select("#chHisto").on("change", function(d) {
-        setting.showHistogram = this.checked;
+        // setting.showHistogram = this.checked;
+        setting.showHistogram = false;
     });
 
     d3.select("#chLeg").on("change", function(d) {
