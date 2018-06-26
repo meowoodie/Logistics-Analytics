@@ -13,8 +13,13 @@ import pandas as pd
 import heapq
 import json
 import arrow as ar
+import sys
 code_start_time = ar.now()
-path = '../trainedData/'
+try:
+    path = '../' + sys.argv[1]
+except:
+    path = '../trainedDataSmall/'
+
 fname_dict = path + 'dicts.txt'
 fname_dicts_mark = path +'dicts_mark.txt'
 fname_tplg = path + 'tplg.txt'
@@ -36,7 +41,13 @@ with open(fname_nl, 'r') as f:
 with open(fname_dicts_mark, 'r') as f:
     dict_s_mark = json.load(f)
 #### Debug parameters
-breakFlag = False
+try:
+    breakFlag = sys.argv[2] == 'True'
+except:
+    breakFlag = False
+
+print('path = ' +path)
+print('breakFlag = ' + str(breakFlag))
 ####
 
 #print( dt.strptime('2017-04-15 23:59:59', '%Y-%m-%d %H:%M:%S')>from_time)
@@ -172,7 +183,6 @@ fv = fv.join(df_set)
 fv.to_csv(fname_fv, sep='\t')
 logf = open(path+'feature_log.txt', 'w', encoding = 'utf8')
 logf.write('Produced by feature.py\n')
-logf.write('See whether there is bug in dayaverage and variation.\n')
 logf.write('Feature vectors should be fine.\n')
 logf.write('Use A_s instead of A\n')
 logf.write('Code starts at: '+str(code_start_time)+'\n')

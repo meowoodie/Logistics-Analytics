@@ -15,8 +15,12 @@ import heapq
 import json
 import os
 import arrow as ar
+import sys
 code_start_time = ar.now()
-path = '../trainedData/'
+try:
+    path = '../' + sys.argv[1]
+except:
+    path = '../trainedDataSmall/'
 if not os.path.exists(path):
     os.makedirs(path)
 fname = '../../../rawdata/steven_monthly_code_tel_201701_07_nm71.txt'
@@ -31,7 +35,10 @@ ofname_As = path + 'A_s.txt'
 ofname_Ar = path + 'A_r.txt'
 ofname_nl = path + 'namelist.txt'
 #### Debug parameters
-breakFlag = True
+try:
+    breakFlag = sys.argv[2] == 'True'
+except:
+    breakFlag = True
 printline = 100000
 from_time = dt.strptime('2017-05-01 00:00:00', '%Y-%m-%d %H:%M:%S')
 to_time = dt.strptime('2017-06-30 23:59:59', '%Y-%m-%d %H:%M:%S')

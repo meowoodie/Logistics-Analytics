@@ -12,7 +12,13 @@ from sklearn.externals import joblib
 import arrow as ar
 import matplotlib.pyplot as plt
 import numpy as np
-path = '../trainedData/'
+import sys
+try:
+    path = '../' + sys.argv[1]
+except:
+    path = '../trainedDataSmall/'
+print('path = ' +path)
+
 SimM = np.load(path +'SimilaryMatrix2.npy')
 max_k = 40
 pca = PCA(n_components = max_k*2, random_state = 920804).fit(SimM)
@@ -40,8 +46,10 @@ plt.ylabel('Similarity')
 plt.title('within-cluster similarity')
 plt.savefig(path +'within_cl_sim.pdf')
 
-
-ncl = 8
+try:
+    ncl = int(sys.argv[2])
+except:
+    ncl = 8
 pca = PCA(n_components = ncl*2, random_state = 920804).fit(SimM)
 X_pca = pca.transform(SimM)
 pca_file = path +'PCA_model.pkl'

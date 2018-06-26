@@ -22,9 +22,10 @@ import simFunction as sf
 time1 = ar.now()
 ######### input
 # target = '0000841919'
-target = '0000187738' #SimM_ind[0] ##"0000"
+target = '0000322504'
+# target = '0000187738' #SimM_ind[0] ##"0000"
 Rec_dict_len = 1000
-path = '../trainedData/'
+path = '../trainedDataFull/'
 pca = joblib.load(path + 'PCA_model.pkl')           #trained pca
 km_pca = joblib.load(path + 'km_pca_model.pkl')     #trained kmeans model
 SimM1 = np.load(path + 'SimilaryMatrix.npy')        #trained based line similarity matrix
@@ -34,70 +35,52 @@ fv = fv.set_index('CMark')
 A_sparse_send = scs.load_npz(path + 'A_sparse_send_full.npz')
 score_mtx_rec = A_sparse_send.transpose(copy = True)
 score_mtx_send = score_mtx_rec.transpose(copy = True)
-# fname_nl = path +'namelist.txt'
-# with open(fname_nl, 'r') as f:
-#     namelist = json.load(f)
+
+with open(path +'NBS.txt', 'r') as f:
+    NBS = json.load(f)
+with open(path +'NBR.txt', 'r') as f:
+    NBR = json.load(f)
+
 namelist = list(fv.index)
 #########
 rd.seed(19920804)
 Rec_dict = {}
 SimPair = {}
-NBS = {}
-NBR = {}
 n_mark = len(SimM_ind)
 SM1_ind_set = set(SimM_ind)
-thres = 0
+thres = 1
+rdl = 150
 # if target in SimM_ind:
 #     fv = fv.loc[SimM_ind]
 # else:
 #     fv = fv.loc[np.append(SimM_ind, target)]
-
-
+namedic = {}
+for i,key in enumerate(namelist):
+    namedic[key] = i
+base_line_index = [ namedic[i] for i in SimM_ind]
+base_namedic = {}
+for i,ind in enumerate(base_line_index):
+    base_namedic[ind] = i
 Mark2Ind = {}
 for i in range(n_mark):
     Mark2Ind[SimM_ind[i]] = i
-    x = SimM_ind[i]
-    x_ind = namelist.index(x)
-    xx_ind = (score_mtx_send[x_ind,:]>thres).nonzero()[1]
-    xx_ind_sort = sorted(xx_ind, key=lambda k: score_mtx_send[x_ind,k])[::-1]
-    NBS[x] = []
-    for j in xx_ind_sort:
-        if (namelist[j] in SM1_ind_set) and (namelist[j]!=x):
-            NBS[x].append(namelist[j])
-    if len(NBS[x])==0:
-        del NBS[x]
-    xx_ind = (score_mtx_send[:,x_ind]>thres).nonzero()[0]
-    xx_ind_sort = sorted(xx_ind, key=lambda k: score_mtx_send[k,x_ind])[::-1]
-    NBR[x] = []
-    for j in xx_ind_sort:
-        if (namelist[j] in SM1_ind_set) and (namelist[j]!=x):
-            NBR[x].append(namelist[j])
-    if len(NBR[x])==0:
-        del NBR[x]
 
 if target not in NBS:
     x = target
     x_ind = namelist.index(x)
-    xx_ind = (score_mtx_send[x_ind,:]>thres).nonzero()[1]
-    xx_ind_sort = sorted(xx_ind, key=lambda k: score_mtx_send[x_ind,k])[::-1]
-    NBS[x] = []
-    for j in xx_ind_sort:
-        if (namelist[j] in SM1_ind_set) and (namelist[j]!=x):
-            NBS[x].append(namelist[j])
-    if len(NBS[x])==0:
-        del NBS[x]
+    score_mtx_send[x_ind, x_ind] = 0
+    xx_ind = (score_mtx_send[x_ind,base_line_index]>thres).nonzero()[1]
+    if len(xx_ind)>0:
+        xx_ind_sort = sorted(xx_ind, key=lambda k: score_mtx_send[x_ind,k])[::-1]
+        NBS[x] = [SimM_ind[j] for j in xx_ind_sort[0:min(rdl, len(xx_ind))]]
 
 if target not in NBR:
     x = target
     x_ind = namelist.index(x)
-    xx_ind = (score_mtx_send[:,x_ind]>thres).nonzero()[0]
-    xx_ind_sort = sorted(xx_ind, key=lambda k: score_mtx_send[k,x_ind])[::-1]
-    NBR[x] = []
-    for j in xx_ind_sort:
-        if (namelist[j] in SM1_ind_set) and (namelist[j]!=x):
-            NBR[x].append(namelist[j])
-    if len(NBR[x])==0:
-        del NBR[x]
+    xx_ind = (score_mtx_send[base_line_index,x_ind]>thres).nonzero()[0]
+    if len(xx_ind)>0:
+        xx_ind_sort = sorted(xx_ind, key=lambda k: score_mtx_send[k,x_ind])[::-1]
+        NBR[x] = [SimM_ind[j] for j in xx_ind_sort[0:min(rdl, len(xx_ind))]]
 # of_D = open('May-June/DownRec_fast.txt', 'a')
 # of_U = open('May-June/UpRec_fast.txt', 'a')
 
@@ -106,7 +89,6 @@ print(target)
 print('Compute Sim.\n')
 Rec_dict[target] ={}
 x = target
-rdl = 150
 sim_v = np.array([])
 
 ## depth 2 similarity , to change to depth 1 similarity, can only compute
@@ -121,12 +103,12 @@ for j in range(n_mark):
     if (x in NBS) and( y in NBS):
         nn = len(NBS[x])
         mm = len(NBS[y])
-        if (nn>rdl):
-            NBS[x] = [NBS[x][ind] for ind in rd.sample(range(nn), rdl)]
-            nn = rdl
-        if (mm>rdl):
-            NBS[y] = [NBS[y][ind] for ind in rd.sample(range(mm), rdl)]
-            mm = rdl
+        # if (nn>rdl):
+        #     NBS[x] = [NBS[x][ind] for ind in rd.sample(range(nn), rdl)]
+        #     nn = rdl
+        # if (mm>rdl):
+        #     NBS[y] = [NBS[y][ind] for ind in rd.sample(range(mm), rdl)]
+        #     mm = rdl
         t = t +1
         alist = []
         blist = []
@@ -153,12 +135,12 @@ for j in range(n_mark):
     if (x in NBR) and (y in NBR):
         nn = len(NBR[x])
         mm = len(NBR[y])
-        if (nn>rdl):
-            NBR[x] = [NBR[x][ind] for ind in rd.sample(range(nn), rdl)]
-            nn = rdl
-        if (mm>rdl):
-            NBR[y] = [NBR[y][ind] for ind in rd.sample(range(mm), rdl)]
-            mm = rdl
+        # if (nn>rdl):
+        #     NBR[x] = [NBR[x][ind] for ind in rd.sample(range(nn), rdl)]
+        #     nn = rdl
+        # if (mm>rdl):
+        #     NBR[y] = [NBR[y][ind] for ind in rd.sample(range(mm), rdl)]
+        #     mm = rdl
         t = t +1
         alist = []
         blist = []

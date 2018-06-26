@@ -10,13 +10,20 @@ import scipy.sparse
 import numpy as np
 import arrow as ar
 import json
+import sys
 
 code_start_time = ar.now()
-path = '../trainedData/'
+try:
+    path = '../' + sys.argv[1]
+except:
+    path = '../trainedDataSmall/'
+print('path = ' +path)
+
 fname_As = path + 'A_s.txt'
 fname_Ar = path + 'A_r.txt'
 fname_nl = path +'namelist.txt'
 of_comls = path +'com_list_5000.txt'
+of_act = path +'activites.txt'
 with open(fname_nl, 'r') as f:
     namelist = js.load(f)
 with open(fname_As, 'r') as f:
@@ -24,21 +31,44 @@ with open(fname_As, 'r') as f:
 activities_count =[0]*len(namelist)
 # with open(fname_Ar, 'r') as f:
 #     A_r = js.load(f)
+namedic = {}
+for i,key in enumerate(namelist):
+    namedic[key] = i
 row = []
 column = []
 data  = []
 count = -1
 test_sum = 0
+count = 0
+# of = open(path + 'sparseAs.txt', 'a')
+print('begin writing')
 for x in A_s:
+    count = count +1
+    if (count%2000)==0:
+        print(count)
+        # of.close()
+        # of = open(path + 'sparseAs.txt', 'a')
+    # test_time1 = ar.now()
+    # i = namelist.index(x)
+    # print(i)
+    # test_time2 = ar.now()
+    # print(test_time2 - test_time1)
+    # test_time1 = ar.now()
+    i = namedic[x]
+    # print(i)
+    # test_time2 = ar.now()
+    # print(test_time2 - test_time1)
     for y in A_s[x]:
-        i = namelist.index(x)
-        j = namelist.index(y)
+        j = namedic[y]
+        # j = namelist.index(y)
         row.append(i)
         column.append(j)
         data.append(A_s[x][y])
+        of.write(str(i)+'\t'+str(j)+'\t'+str(A_s[x][y])+'\n')
         activities_count[i] = activities_count[i] + A_s[x][y]
         activities_count[j] = activities_count[j] + A_s[x][y]
 print(len(row))
+# of.close()
 row = np.array(row)
 column = np.array(column)
 data = np.array(data)
@@ -46,6 +76,8 @@ n = len(namelist)
 A_sparse_send = spm((data,(row, column)), shape= (n, n))
 scipy.sparse.save_npz(path+'A_sparse_send_full', A_sparse_send)
 sort_ind = sorted(range(n), key=lambda k: activities_count[k])
+# with open(of_act, 'w') as f:
+#     json.dump(activities_count, f)
 sort_ind = sort_ind[::-1]
 with open(of_comls, 'w') as f:
     json.dump([ namelist[i]   for i in sort_ind[0:5000]],f)
