@@ -15,7 +15,7 @@ count_fields    = [ field_name, "count" ]
 pct_fields      = [ field_name, "pct" ]
 # Init Spark Context as running in local mode
 sc    = SparkContext("local")
-# Create a basic Spark Session 
+# Create a basic Spark Session
 spark = SparkSession \
 	.builder \
 	.appName(app_name) \
