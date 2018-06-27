@@ -127,9 +127,9 @@ class RecommendResult(DBConnecter):
 		return {
 			"company_id":  result["company_id"],
 			"up_ids":      result["up_ids"].split(","),
-			"up_scores":   map(float, result["up_scores"].split(",")),
+			"up_scores":   [ float(item) for item in result["up_scores"].split(",") ],
 			"down_ids":    result["down_ids"].split(","),
-			"down_scores": map(float, result["down_scores"].split(","))
+			"down_scores": [ float(item) for item in result["down_scores"].split(",")]
 		}
 
 
