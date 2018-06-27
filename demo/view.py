@@ -52,10 +52,9 @@ def feature_vec():
 def similar_companies():
     matched_items = {}
     # Parse requested parameters
-    print request.method
+    # print(request.method)
     if request.method == "POST":
-    	para_dict   = json.loads(request.data)
-        print para_dict
+        para_dict   = json.loads(request.data)
         company_id  = para_dict["companyId"]
         down_stream = para_dict["downStream"]
         up_stream   = para_dict["upStream"]

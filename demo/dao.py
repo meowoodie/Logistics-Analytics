@@ -147,5 +147,5 @@ if __name__ == "__main__":
 	down_ids    = res["down_ids"][:20]
 	down_scores = res["down_scores"][:20]
 	items = dao2.get("company_id", up_ids)
-	print up_ids
-	print [ i["company_id"] for i in items ]
+	# print up_ids
+	# print [ i["company_id"] for i in items ]
