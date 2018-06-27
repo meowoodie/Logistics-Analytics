@@ -10,7 +10,8 @@
 
 	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <meta name="viewport" content="width=device-width" />
-
+		<!-- d3 Map CSS -->
+		<link href="{{ url_for('static', filename='css/d3map.css') }}" rel="stylesheet" />
 
     <!-- Bootstrap core CSS     -->
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" />
@@ -27,7 +28,7 @@
 </head>
 
 <body>
-
+	<div id="test"></div>
 	<div class="wrapper">
 	    <div class="sidebar" data-color="green" data-image="{{ url_for('static', filename='img/sidebar-1.jpg') }}">
 			<!--
@@ -214,16 +215,23 @@
 </body>
 	<!-- Core JS Files   -->
 	<script src="{{ url_for('static', filename='js/jquery-3.1.0.min.js') }}" type="text/javascript"></script>
-		<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}" type="text/javascript"></script>
+	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}" type="text/javascript"></script>
 	<script src="{{ url_for('static', filename='js/material.min.js') }}" type="text/javascript"></script>
 	<script src="{{ url_for('static', filename='js/underscore.js') }}" type="text/javascript"></script>
-	<script src="https://d3js.org/d3.v4.min.js"></script>
+
+	<!-- D3.js -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.4/nv.d3.min.css"/>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.5/nv.d3.min.js"></script>
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+	<script src="https://d3js.org/topojson.v1.min.js"></script>
 
 	<!-- Notifications Plugin -->
 	<script src="{{ url_for('static', filename='js/bootstrap-notify.js') }}"></script>
 
 	<!-- Main JS code -->
-	<script src="{{ url_for('static', filename='js/maps.js') }}"></script>
+	<!-- <script src="{{ url_for('static', filename='js/maps.js') }}"></script> -->
+	<script src="{{ url_for('static', filename='js/d3map.js') }}"></script>
 
 	<!-- Google Maps Plugin -->
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4g1uo-ONEqqnTYMWFww-7Rxbqgve6nsA" type="text/javascript"></script>
@@ -232,14 +240,19 @@
 	<script src="{{ url_for('static', filename='js/material-dashboard.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
 
-    <script>
+	<!-- Hardcoded map data (Topojson) -->
+	<script src="{{ url_for('static', filename='js/china_cities.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/china_provinces.js') }}"></script>
+  <script>
 
-    	maps.initGoogleMaps("map");
-    	// Configuration of colorbar
-    	var colorbarLength = 1000,
-    		colorbar = d3.scaleLinear().domain([1,colorbarLength])
-			.interpolate(d3.interpolateHcl)
-			.range([d3.rgb("#007AFF"), d3.rgb("#FFF500")]);
+  	// maps.initGoogleMaps("map");
+		maps.initD3Map("test");
+
+  	// // Configuration of colorbar
+  	// var colorbarLength = 1000,
+		//     colorbar = d3.scaleLinear().domain([1,colorbarLength])
+		// 			.interpolate(d3.interpolateHcl)
+		// 			.range([d3.rgb("#007AFF"), d3.rgb("#FFF500")]);
 
 		// Get dom elements by their Ids
 		var computeBtn    = document.getElementById("compute_btn"),
@@ -398,7 +411,6 @@
 				recNum: Rec_n.value,
 				areas: areaList
 			};
-			// console.log(para);
 			requestBackEnd(para,"/similarCompanies").then(function(Rec_info){
 				if (queryMarkers != null) {
 					maps.clearMarkers(queryMarkers);
@@ -407,7 +419,7 @@
 					colorPointsDownStream = new Array();
 					colorPointTarget = new Array();
 				}
-				console.log(Rec_info['target']);
+				// console.log(Rec_info['target']);
         colorPointTarget =  _.map(Rec_info['target'], function(info, rank){
 					// TODO: a patch for fixing wrong location info for Xi'an City
 					if (info['area_code'] == "029Y"){
@@ -445,7 +457,7 @@
 					showRecList(Rec_info['downs'],'down');
 					// console.log(Rec_info);
 					weight = _.map(Rec_info['downs'], function(info, companyID){
-						return(info['score'])
+						return(info['score']);
 					});
 					weight_max = _.max(weight);
 					weight_min = _.min(weight)*0.8;
@@ -523,9 +535,9 @@
 				var colorPoints = colorPointsUpStream.concat(colorPointsDownStream);
 				colorPoints = colorPoints.concat(colorPointTarget);
 				// console.log(colorPoints);
-				queryMarkers = maps.createRecommendedMarkers(colorPoints,[]);
+				queryMarkers = maps.createRecommendedMarkers(colorPoints);
 				// console.log(queryMarkers);
-				maps.fitBound(queryMarkers);
+				// maps.fitBound(queryMarkers);
 			}, function (msg) {
 				alert(msg);
 			});

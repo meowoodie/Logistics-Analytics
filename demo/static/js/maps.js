@@ -49,7 +49,7 @@ maps = {
       // console.log(bounds.getCenter())
     },
 
-    createRecommendedMarkers: function(points, lines){
+    createRecommendedMarkers: function(points){
       return _.map(points, function(point){
         if (point["color"] == 'yellow'){
           var marker = new google.maps.Marker({
