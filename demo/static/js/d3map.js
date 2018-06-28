@@ -1,14 +1,25 @@
-var container, proj, path;
+var map, container, proj, path,
+    width = 800, height = 800;
 
 var tip = d3.tip()
     .attr('class', 'd3-tip')
     .offset([-30, 0])
     .html(function(d) {
-        return "<div><p>"+ d.city_name + '</p><canvas id="pie-chart" width="400" height="400"></canvas><div>';
+        return String.format('\
+            <div class="content">\
+                <div class="row">\
+                  <div class = "col-md-8 col-lg-offset-2">\
+                        <div class="row"><p class="card-text">公司 ID: {0}</p></div>\
+                        <div class="row"><p class="card-text">主营业务: {1}</p></div>\
+                        <div class="row"><p class="card-text">行业类型_lv1: {2}</p></div>\
+                        <div class="row"><p class="card-text">城市: {3}</p></div>\
+                  </div>\
+                </div>\
+            </div>', d.id, d.mb, d.ind1, d.city);
     });
 
 maps = {
-  initD3Map: function(domId) {
+  initD3Map: function(domId, position) {
     // Functions that supports zooming the canvas
     function dottype(d) {
         d.x = +d.x;
@@ -32,8 +43,9 @@ maps = {
     function dragended(d) {
         d3.select(this).classed("dragging", false);
     };
+    
     // Init map and zoom widgets
-    var map = d3.map(),
+    map = d3.map(),
         zoom = d3.behavior.zoom()
             .scaleExtent([1, 10])
             .on("zoom", zoomed),
@@ -43,14 +55,15 @@ maps = {
             .on("drag", dragged)
             .on("dragend", dragended);
 
-    var width = 1200, height = 1000;
-
-    proj = d3.geo.mercator().center([105, 38]).scale(1000).translate([width/2, height/2]),
+    // position = [105, 38]
+    proj = d3.geo.mercator().center(position).scale(1000).translate([width/2, height/2]),
     path = d3.geo.path().projection(proj);
 
     var svg = d3.select("#" + domId).append("svg")
-        .attr("width", width)
-        .attr("height", height)
+        .classed("svg-container", true) //container class to make it responsive
+        // .attr("width", width)
+        // .attr("height", height)
+        .classed("svg-content-responsive", true)
         .call(zoom);
 
     var rect = svg.append("rect")
@@ -80,44 +93,9 @@ maps = {
         .attr("d", path);
 
     container.call(tip);
-
-    container.append("svg")
-        .attr("width", width)
-        .attr("height", height);
   },
 
   createRecommendedMarkers: function(points) {
-
-    // colorbarDict = _.chain(graph.nodes)
-    //     .values()
-    //     .map(function(node_val){return _.keys(node_val.industry_lv1_dist);})
-    //     .flatten()
-    //     .uniq()
-    //     .map(function(industry_name){return [industry_name, dynamicColors()]})
-    //     .object()
-    //     .value();
-
-    // graph.links.forEach(function(d) {
-    //     d.source = graph.nodes[d.source];
-    //     d.target = graph.nodes[d.target];
-    //     source_cood = proj([d.source.lng, d.source.lat]);
-    //     target_cood = proj([d.target.lng, d.target.lat]);
-    //     d.source.x = source_cood[0];
-    //     d.source.y = source_cood[1];
-    //     d.target.x = target_cood[0];
-    //     d.target.y = target_cood[1];
-    // });
-
-    // var link = container.append("g")
-    //     .attr("class", "link")
-    //     .selectAll("line")
-    //     .data(graph.links)
-    //     .enter().append("line")
-    //     .attr("x1", function(d) { return d.source.x; })
-    //     .attr("y1", function(d) { return d.source.y; })
-    //     .attr("x2", function(d) { return d.target.x; })
-    //     .attr("y2", function(d) { return d.target.y; })
-    //     .style("stroke-width", function(d) { return Math.sqrt(d.value); });
 
     var node = container.append("g")
         .attr("class", "node")
@@ -125,53 +103,29 @@ maps = {
         .data(points)
         .enter().append("circle")
         .attr("transform", function(d) { return "translate(" + proj([d.position.lng, d.position.lat]) + ")"; })
-        .attr("r", function(d)  { return d.score/10 > 8 ? 8 : (d.score/10 < 1 ? 1 : d.score / 10);})
-        .style("fill", "Green")
+        .attr("r", function(d)  { return d.score/10 > 12 ? 12 : (d.score/10 < 2 ? 2 : d.score / 10);})
+        .style("fill", function(d) { return d.color; })
         .on("mouseover", function(d) {
             d3.select(this)
                 .transition()
                 .duration(500)
                 .style("cursor", "pointer")
                 .attr("r", 20) // The bar becomes larger
-                .style("fill", "Red");
+                .style("fill", "green");
             tip.show(d);
-            // // generating content of tip graph
-            // var ctx = $("#pie-chart");
-            // var industData = {
-            //     datasets: [{
-            //         data: _.values(d.industry_lv1_dist),
-            //         backgroundColor: _.chain(d.industry_lv1_dist) // colorBar
-            //             .keys()
-            //             .map(function(industry_name){return colorbarDict[industry_name];})
-            //             .value()
-            //     }],
-            //     labels: _.keys(d.industry_lv1_dist)
-            // };
-            // var industDoughnutChart = new Chart(ctx,{
-            //     type: 'doughnut',
-            //     data: industData
-            // });
         })
         .on("mouseout", function() {
             d3.select(this)
                 .transition()
                 .duration(500)
                 .style("cursor", "normal")
-                .attr("r", function(d)  { return d.score/10 > 8 ? 8 : (d.score/10 < 1 ? 1 : d.score / 10);})
-                .style("fill", "Green");
+                .attr("r", function(d)  { return d.score/10 > 12 ? 12 : (d.score/10 < 2 ? 2 : d.score / 10);})
+                .style("fill", function(d) {return d.color; });
             tip.hide();
         });
 
-    // var text = container.append("g")
-    //     .attr("class", "text")
-    //     .selectAll("string")
-    //     .data(graph.nodes)
-    //     .enter().append("text")
-    //     .attr("transform", function(d) { return "translate(" + proj([d.lng, d.lat]) + ")"; })
-    //     .attr("dx", "1em")
-    //     .attr("dy", "-0.1em")
-    //     .style("font-size", "5px")
-    //     .text(function(d) { return d.city_name; });
-
+  },
+  clearMarkers: function () {
+      container.selectAll("circle").remove();
   }
 };
