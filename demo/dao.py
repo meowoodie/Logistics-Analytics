@@ -13,8 +13,8 @@ import json
 import requests
 from ast import literal_eval
 
-BASE_DOMAIN = "139.162.173.91"
-# BASE_DOMAIN = "127.0.0.1"
+#BASE_DOMAIN = "139.162.173.91"
+BASE_DOMAIN = "127.0.0.1"
 #CONN_PORT   = "3000"
 CONN_PORT   = "3000"
 

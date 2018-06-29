@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../common/mixins",
+      "./mixins"
+    ]
+  },
+  "company_info": {
+    "dataSource": "sfexpress_ds",
+    "public": true
+  },
+  "recom_res": {
+    "dataSource": "sfexpress_ds",
+    "public": true
+  },
+  "feature_vec": {
+    "dataSource": "sfexpress_ds",
+    "public": true
+  }
+}

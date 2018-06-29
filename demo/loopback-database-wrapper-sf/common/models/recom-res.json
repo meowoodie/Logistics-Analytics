@@ -1,0 +1,23 @@
+{
+  "name": "recom_res",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "id": true,
+      "required": true
+    },
+    "up_ids": {"type": "string"},
+    "up_scores": {"type": "string"},
+    "down_ids": {"type": "string"},
+    "down_scores": {"type": "string"}
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

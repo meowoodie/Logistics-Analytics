@@ -1,0 +1,12 @@
+{
+  "sfexpress_ds": {
+    "host": "localhost",
+    "port": 3306,
+    "url": "mysql://root:ffjjddkk@localhost/sfexpress",
+    "database": "sfexpress",
+    "password": "ffjjddkk",
+    "name": "sfexpress_ds",
+    "user": "root",
+    "connector": "mysql"
+  }
+}
