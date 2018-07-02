@@ -22,8 +22,8 @@
     <link href="{{ url_for('static', filename='css/demo.css') }}" rel="stylesheet" />
 
     <!--     Fonts and icons     -->
-    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
-    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet' type='text/css'>
+    <link href="{{ url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/Matrerial_Icons.css') }}" rel='stylesheet' type='text/css'>
 </head>
 
 <body>
@@ -41,7 +41,8 @@
 					<div class = "col-md-2">
 					</div>
 					<div class = "col-md-8">
-						<a href="http://www.creative-tim.com" class="simple-text">
+						<a class="simple-text">
+						<!-- href="http://www.creative-tim.com"  -->
 							顺丰科技 <br/>物流网络分析
 						</a>
 					</div>
@@ -249,7 +250,7 @@
 </body>
 	<!-- Core JS Files   -->
 	<script src="{{ url_for('static', filename='js/jquery-3.1.0.min.js') }}" type="text/javascript"></script>
-		<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}" type="text/javascript"></script>
+	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}" type="text/javascript"></script>
 	<script src="{{ url_for('static', filename='js/material.min.js') }}" type="text/javascript"></script>
 	<script src="{{ url_for('static', filename='js/underscore.js') }}" type="text/javascript"></script>
 	<script src="{{ url_for('static', filename='js/d3.v4.min.js') }}"></script>

@@ -43,7 +43,35 @@ maps = {
     function dragended(d) {
         d3.select(this).classed("dragging", false);
     };
-    
+
+    // // Function for making a star
+    // function CalculateStarPoints(centerX, centerY, arms, outerRadius, innerRadius){
+    //    var results = "";
+    //
+    //    var angle = Math.PI / arms;
+    //
+    //    for (var i = 0; i < 2 * arms; i++)
+    //    {
+    //       // Use outer or inner radius depending on what iteration we are in.
+    //       var r = (i & 1) == 0 ? outerRadius : innerRadius;
+    //
+    //       var currX = centerX + Math.cos(i * angle) * r;
+    //       var currY = centerY + Math.sin(i * angle) * r;
+    //
+    //       // Our first time we simply append the coordinates, subsequet times
+    //       // we append a ", " to distinguish each coordinate pair.
+    //       if (i == 0)
+    //       {
+    //          results = currX + "," + currY;
+    //       }
+    //       else
+    //       {
+    //          results += ", " + currX + "," + currY;
+    //       }
+    //    }
+    //
+    //    return results;
+    // };
     // Init map and zoom widgets
     map = d3.map(),
         zoom = d3.behavior.zoom()
@@ -96,14 +124,14 @@ maps = {
   },
 
   createRecommendedMarkers: function(points) {
-
+    var pointMax = 8;
     var node = container.append("g")
         .attr("class", "node")
         .selectAll("circle")
-        .data(points)
+        .data(points.slice(0,(points.length-1)))
         .enter().append("circle")
-        .attr("transform", function(d) { return "translate(" + proj([d.position.lng, d.position.lat]) + ")"; })
-        .attr("r", function(d)  { return d.score/10 > 12 ? 12 : (d.score/10 < 2 ? 2 : d.score / 10);})
+        .attr("transform", function(d) { return "translate(" + proj([d.position.lng+Math.random()/3, d.position.lat+Math.random()/3]) + ")"; })
+        .attr("r", function(d)  { return d.score/10 > pointMax ? pointMax : (d.score/10 < 2 ? 2 : d.score / 10);})
         .style("fill", function(d) { return d.color; })
         .on("mouseover", function(d) {
             d3.select(this)
@@ -119,10 +147,37 @@ maps = {
                 .transition()
                 .duration(500)
                 .style("cursor", "normal")
-                .attr("r", function(d)  { return d.score/10 > 12 ? 12 : (d.score/10 < 2 ? 2 : d.score / 10);})
+                .attr("r", function(d)  { return d.score/10 > pointMax ? pointMax : (d.score/10 < 2 ? 2 : d.score / 10);})
                 .style("fill", function(d) {return d.color; });
             tip.hide();
         });
+    var nodeTarget = container.append("g")
+        .attr("class", "node")
+        .selectAll("circle")
+        .data(points.slice(points.length-1, points.length))
+        .enter().append("circle")
+        .attr("transform", function(d) { return "translate(" + proj([d.position.lng+Math.random()/3, d.position.lat+Math.random()/3]) + ")"; })
+        .attr("r", pointMax)
+        .style("fill", function(d) { return d.color; })
+        .on("mouseover", function(d) {
+            d3.select(this)
+                .transition()
+                .duration(500)
+                .style("cursor", "pointer")
+                .attr("r", 20) // The bar becomes larger
+                .style("fill", "green");
+            tip.show(d);
+        })
+        .on("mouseout", function() {
+            d3.select(this)
+                .transition()
+                .duration(500)
+                .style("cursor", "normal")
+                .attr("r", pointMax)
+                .style("fill", function(d) {return d.color; });
+            tip.hide();
+        });
+
 
   },
   clearMarkers: function () {
