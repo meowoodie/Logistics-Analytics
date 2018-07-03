@@ -22,6 +22,12 @@ company_id_handler    = CompanyInfo(token)
 recommend_res_handler = RecommendResult(token)
 feature_vec_handler   = FeatureVector(token)
 
+# load preTrain database
+import sys
+sys.path.append('module/algorithm/')
+from readData import *
+
+
 # Renderring main web page
 @app.route("/recommendation")
 def Recommendation():
@@ -62,6 +68,80 @@ def similar_companies():
         areas       = para_dict["areas"]
         # fetch results from database
         res = recommend_res_handler[company_id]
+        up_ids      = res["up_ids"]
+        up_scores   = res["up_scores"]
+        down_ids    = res["down_ids"]
+        down_scores = res["down_scores"]
+        matched_items["target"] = company_id_handler.get("company_id", [company_id])
+        if up_stream:
+            unsorted_items = company_id_handler.get("company_id", up_ids)
+            # unsorted_items = [ item for item in unsorted_items if item["area_code"] in areas ]
+            matched_items["ups"] = []
+            for i in range(len(up_ids)):
+                _id   = up_ids[i]
+                score = up_scores[i]
+                cand  = {}
+                for item in unsorted_items:
+                    if item["company_id"] == _id:
+                        cand = item
+                        break
+                cand["score"] = score
+                matched_items["ups"].append(cand)
+            matched_items["ups"] = [item for item in matched_items["ups"] if "area_code" in item and item["area_code"] in areas]
+            matched_items["ups"] = matched_items["ups"][:rec_num]
+        if down_stream:
+            unsorted_items = company_id_handler.get("company_id", down_ids)
+            # unsorted_items = [ item for item in unsorted_items if item["area_code"] in areas ]
+            matched_items["downs"] = []
+            for i in range(len(down_ids)):
+                _id   = down_ids[i]
+                score = down_scores[i]
+                cand  = {}
+                for item in unsorted_items:
+                    if item["company_id"] == _id:
+                        cand = item
+                        break
+                cand["score"] = score
+                matched_items["downs"].append(cand)
+            matched_items["downs"] = [item for item in matched_items["downs"] if "area_code" in item and item["area_code"] in areas]
+            matched_items["downs"] = matched_items["downs"][:rec_num]
+    else:
+    	return json.dumps({
+    		"status": 1,
+    		"msg": "Invalid Request Type" })
+
+    return json.dumps({
+    	"status": 0,
+    	"res": matched_items })
+
+@app.route("/similarCompanies2", methods=["POST"])
+def similar_companies2():
+    matched_items = {}
+    # Parse requested parameters
+    # print(request.method)
+    if request.method == "POST":
+        para_dict   = json.loads(request.data)
+        company_id  = para_dict["companyId"]
+        down_stream = para_dict["downStream"]
+        up_stream   = para_dict["upStream"]
+        rec_num     = int(para_dict["recNum"])
+        areas       = para_dict["areas"]
+        # fetch results from database
+        indSet = set(SimM_ind)
+        indSet.add(company_id)
+        fv_target_base = fv.loc[list(indSet),:]
+        # if company_id not in indSet = set(SimM_ind):
+        #     fv_target = feature_vec_handler[company_id]
+        #     for key in fv_target:
+        #         if '_set' in key:
+        #             fv_target[key] = [fv_target[key]]
+        #     del(fv_target['company_id'])
+        #     fv_target = pd.DataFrame(fv_target)
+        #     fv_target = fv_target.set_index('CMark')
+        #     fv = pd.concat([fv_target, fv_base_line])
+        # else:
+        #     fv = fv_base_line
+        res = pRFf.recom(company_id, pca, km_pca, SimM1, SimM_ind, fv_target_base, A_sparse_send, NBS, NBR, namelist)
         up_ids      = res["up_ids"]
         up_scores   = res["up_scores"]
         down_ids    = res["down_ids"]

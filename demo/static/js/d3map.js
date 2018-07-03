@@ -125,20 +125,21 @@ maps = {
 
   createRecommendedMarkers: function(points) {
     var pointMax = 8;
+    var pointMin = 3;
     var node = container.append("g")
         .attr("class", "node")
         .selectAll("circle")
         .data(points.slice(0,(points.length-1)))
         .enter().append("circle")
         .attr("transform", function(d) { return "translate(" + proj([d.position.lng+Math.random()/3, d.position.lat+Math.random()/3]) + ")"; })
-        .attr("r", function(d)  { return d.score/10 > pointMax ? pointMax : (d.score/10 < 2 ? 2 : d.score / 10);})
+        .attr("r", function(d)  { return d.score*40 > pointMax ? pointMax : (d.score*40 < pointMin ? pointMin : (d.score *40));})
         .style("fill", function(d) { return d.color; })
         .on("mouseover", function(d) {
             d3.select(this)
                 .transition()
                 .duration(500)
                 .style("cursor", "pointer")
-                .attr("r", 20) // The bar becomes larger
+                .attr("r", 15) // The bar becomes larger
                 .style("fill", "green");
             tip.show(d);
         })
@@ -147,10 +148,11 @@ maps = {
                 .transition()
                 .duration(500)
                 .style("cursor", "normal")
-                .attr("r", function(d)  { return d.score/10 > pointMax ? pointMax : (d.score/10 < 2 ? 2 : d.score / 10);})
+                .attr("r", function(d)  { return d.score*40 > pointMax ? pointMax : (d.score*40 < pointMin ? pointMin : (d.score *40));})
                 .style("fill", function(d) {return d.color; });
             tip.hide();
         });
+    console.log(node);
     var nodeTarget = container.append("g")
         .attr("class", "node")
         .selectAll("circle")
@@ -164,7 +166,7 @@ maps = {
                 .transition()
                 .duration(500)
                 .style("cursor", "pointer")
-                .attr("r", 20) // The bar becomes larger
+                .attr("r", 15) // The bar becomes larger
                 .style("fill", "green");
             tip.show(d);
         })
