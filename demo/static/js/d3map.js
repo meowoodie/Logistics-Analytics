@@ -126,33 +126,6 @@ maps = {
   createRecommendedMarkers: function(points) {
     var pointMax = 8;
     var pointMin = 3;
-    var node = container.append("g")
-        .attr("class", "node")
-        .selectAll("circle")
-        .data(points.slice(0,(points.length-1)))
-        .enter().append("circle")
-        .attr("transform", function(d) { return "translate(" + proj([d.position.lng+Math.random()/3, d.position.lat+Math.random()/3]) + ")"; })
-        .attr("r", function(d)  { return d.score*40 > pointMax ? pointMax : (d.score*40 < pointMin ? pointMin : (d.score *40));})
-        .style("fill", function(d) { return d.color; })
-        .on("mouseover", function(d) {
-            d3.select(this)
-                .transition()
-                .duration(500)
-                .style("cursor", "pointer")
-                .attr("r", 15) // The bar becomes larger
-                .style("fill", "green");
-            tip.show(d);
-        })
-        .on("mouseout", function() {
-            d3.select(this)
-                .transition()
-                .duration(500)
-                .style("cursor", "normal")
-                .attr("r", function(d)  { return d.score*40 > pointMax ? pointMax : (d.score*40 < pointMin ? pointMin : (d.score *40));})
-                .style("fill", function(d) {return d.color; });
-            tip.hide();
-        });
-    console.log(node);
     var nodeTarget = container.append("g")
         .attr("class", "node")
         .selectAll("circle")
@@ -179,6 +152,33 @@ maps = {
                 .style("fill", function(d) {return d.color; });
             tip.hide();
         });
+    var node = container.append("g")
+        .attr("class", "node")
+        .selectAll("circle")
+        .data(points.slice(0,(points.length-1)))
+        .enter().append("circle")
+        .attr("transform", function(d) { return "translate(" + proj([d.position.lng+Math.random()/3, d.position.lat+Math.random()/3]) + ")"; })
+        .attr("r", function(d)  { return Math.sqrt(d.score*100) > pointMax ? pointMax : (Math.sqrt(d.score*100) < pointMin ? pointMin : Math.sqrt(d.score *100));})
+        .style("fill", function(d) { return d.color; })
+        .on("mouseover", function(d) {
+            d3.select(this)
+                .transition()
+                .duration(500)
+                .style("cursor", "pointer")
+                .attr("r", 15) // The bar becomes larger
+                .style("fill", "green");
+            tip.show(d);
+        })
+        .on("mouseout", function() {
+            d3.select(this)
+                .transition()
+                .duration(500)
+                .style("cursor", "normal")
+                .attr("r", function(d)  { return Math.sqrt(d.score*100) > pointMax ? pointMax : (Math.sqrt(d.score*100) < pointMin ? pointMin : Math.sqrt(d.score *100));})
+                .style("fill", function(d) {return d.color; });
+            tip.hide();
+        });
+    console.log(node);
 
 
   },

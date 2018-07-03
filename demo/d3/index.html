@@ -2415,11 +2415,11 @@ var ONE_SECOND = 1000,
         div = div || d3.select(document.body).append("div").attr("id", "c");
         w = document.body.clientWidth;
         h = document.body.clientHeight;
-
+// TODO: Map position
         projection
-            .scale(w/2.2)                           // control zoom in
+            .scale(w/1.5)                           // control zoom in
             // .translate([w / 2, h / 1.6])
-            .translate([-400, 1000])
+            .translate([-1100, 1250])
         ;
 
         zoom.translate(projection.translate())
