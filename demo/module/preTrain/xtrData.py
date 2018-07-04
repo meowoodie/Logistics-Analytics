@@ -132,13 +132,13 @@ for line in f:
             break
         print('%d\n' %all_rows)
 tplglist = {}
-for x in tplg:
-    tplglist[x] = [y for y in tplg[x]]
-print('1')
-cntlist = {}
-for x in cnt:
-    cntlist[x] = [y for y in cnt[x]]
-print('2')
+# for x in tplg:
+#     tplglist[x] = [y for y in tplg[x]]
+# print('1')
+# cntlist = {}
+# for x in cnt:
+#     cntlist[x] = [y for y in cnt[x]]
+# print('2')
 for x in dict_s:
     n = len(dict_s[x])
     sort_ind = sorted(range(n), key=lambda k: dict_s[x][k])
@@ -155,13 +155,13 @@ for x in dict_r:
 print('4')
 namelist = [x for x in nameset]
 print('5')
-with open(ofname_tplg, 'w') as outfile:
-    json.dump(tplglist, outfile)
-del(tplglist)
+# with open(ofname_tplg, 'w') as outfile:
+#     json.dump(tplglist, outfile)
+# del(tplglist)
 print('1')
-with open(ofname_cnt, 'w') as outfile:
-    json.dump(cntlist, outfile)
-del(cntlist)
+# with open(ofname_cnt, 'w') as outfile:
+#     json.dump(cntlist, outfile)
+# del(cntlist)
 print('2')
 with open(ofname_As, 'w') as outfile:
     json.dump(A_s, outfile)
