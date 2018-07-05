@@ -97,7 +97,7 @@ class DBConnecter():
 class FeatureVector(DBConnecter):
 
 	def __init__(self, token):
-		self.url   = "https://%s:%s/api/feature_vecs" % (BASE_DOMAIN, CONN_PORT)
+		self.url   = "https://%s:%s/api/feature_vec2s" % (BASE_DOMAIN, CONN_PORT)
 		self.token = token
 		DBConnecter.__init__(self, self.url, self.token)
 

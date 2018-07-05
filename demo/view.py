@@ -8,7 +8,7 @@ access to backend services or data.
 
 import json
 import arrow
-from flask import Flask, request, url_for, render_template
+from flask import Flask, request, url_for, render_template, Response
 
 from dao import CompanyInfo, RecommendResult, FeatureVector
 
@@ -52,6 +52,13 @@ def feature_vec():
     return json.dumps({
     	"status": 0,
     	"res": res })
+# health check
+@app.route('/healthCheck', methods=['GET', 'POST'])
+def healthCheck():
+    response = {"code": 0, "message":"service start"}
+    resp = Response(json.dumps(response))
+    resp.headers['Content-Type'] = 'application/json;charset=UTF-8'
+    return resp
 
 # API for searching similar company ids with their scores by query id
 @app.route("/similarCompanies", methods=["POST"])
@@ -187,3 +194,5 @@ def similar_companies2():
     return json.dumps({
     	"status": 0,
     	"res": matched_items })
+if __name__=="__main__":
+    app.run(host='0.0.0.0', port=8080, threaded=True)

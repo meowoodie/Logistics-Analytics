@@ -21,7 +21,7 @@
     "dataSource": "sfexpress_ds",
     "public": true
   },
-  "feature_vec": {
+  "feature_vec2": {
     "dataSource": "sfexpress_ds",
     "public": true
   }

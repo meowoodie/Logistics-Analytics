@@ -267,7 +267,7 @@
 	<!-- Material Dashboard javascript methods -->
 	<script src="{{ url_for('static', filename='js/material-dashboard.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
-
+	<script src="{{ url_for('static', filename='js/industList.js') }}" type="text/javascript"></script>
     <script>
     	// Configuration of colorbar
     	var colorbarLength = 1000,
@@ -279,10 +279,10 @@
 
 
 		//Show city list
-		var industList = ["批发和零售业", "建筑业", "农、林、牧、渔业",
-											"房地产业", "政府及公共服务", "专业服务业",
-											"生活服务业", "能源", "交通运输、仓储和邮政业",
-											"金融业", "制造业", "医疗服务"];
+		// var industList = ["批发和零售业", "建筑业", "农、林、牧、渔业",
+		// 									"房地产业", "政府及公共服务", "专业服务业",
+		// 									"生活服务业", "能源", "交通运输、仓储和邮政业",
+		// 									"金融业", "制造业", "医疗服务"];
 		searchBtn.onclick = function(){
 			var options = true;
 			var backgroundColor=["rgb(255, 99, 132)","rgb(75, 192, 192)","rgb(255, 205, 86)",

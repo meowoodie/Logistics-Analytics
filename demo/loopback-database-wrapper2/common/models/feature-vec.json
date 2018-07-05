@@ -1,5 +1,5 @@
 {
-  "name": "feature_vec",
+  "name": "feature_vec2",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
