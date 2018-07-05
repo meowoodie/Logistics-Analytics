@@ -1,10 +1,9 @@
 '''
 Compute features.
 
-Change: Ar and As
+Change: sort indust list
 
-
-last edited: June 7
+last edited: July 3rd.
 '''
 
 from datetime import datetime as dt
@@ -134,6 +133,7 @@ for x in inform:
 indust2_list = []
 for x in indust2_set:
     indust2_list.append(x)
+indust2_list.sort()
 a = 'toIndust'
 b = 'fromIndust'
 a_ = [a+str(x) for x in range(len(indust2_list))]
@@ -152,6 +152,8 @@ for x in range(len(indust2_list)):
     IndustMap_from[indust2_list[x]] = b_[x]
     IndustSet_to[indust2_list[x]] = a_set[x]
     IndustSet_from[indust2_list[x]] =  b_set[x]
+with open(path + 'industList.js', 'w') as f:
+    f.write('var industList = ' + json.dumps(indust2_list) +';')
 count = 0
 df_set = df_set.applymap(lambda x: [])
 sum_test = 0

@@ -131,7 +131,25 @@ for line in f:
         if breakFlag:
             break
         print('%d\n' %all_rows)
-tplglist = {}
+with open(ofname_As, 'w') as outfile:
+    json.dump(A_s, outfile)
+del(A_s)
+with open(ofname_Ar, 'w') as outfile:
+    json.dump(A_r, outfile)
+del(A_r)
+print('1')
+
+namelist = [x for x in nameset]
+namelist.sort()
+with open(ofname_nl, 'w') as outfile:
+    json.dump(namelist, outfile)
+del(namelist)
+print('2')
+with open(ofname_inform, 'w') as outfile:
+    json.dump(inform, outfile)
+del(inform)
+print('3')
+# tplglist = {}
 # for x in tplg:
 #     tplglist[x] = [y for y in tplg[x]]
 # print('1')
@@ -145,55 +163,40 @@ for x in dict_s:
     dict_s[x] = [ dict_s[x][i] for i in sort_ind]
     dict_s_mark[x] = [ dict_s_mark[x][i] for i in sort_ind]
     dict_s[x] =[ np.around(x.total_seconds() / 3600, decimals = 2) for x in (np.array(dict_s[x][0:(n)]) - np.array(from_time))]
-print('3')
+with open(ofname_dicts, 'w') as outfile:
+    json.dump(dict_s, outfile)
+del(dict_s)
+print('4')
+with open(ofname_dicts_mark, 'w') as outfile:
+    json.dump(dict_s_mark, outfile)
+del(dict_s_mark)
+print('5')
+
 for x in dict_r:
     n = len(dict_r[x])
     sort_ind = sorted(range(n), key=lambda k: dict_r[x][k])
     dict_r[x] = [ dict_r[x][i] for i in sort_ind]
     dict_r_mark[x] = [ dict_r_mark[x][i] for i in sort_ind]
     dict_r[x] =[ np.around(x.total_seconds() / 3600, decimals = 2) for x in (np.array(dict_r[x][0:(n)]) - np.array(from_time))]
-print('4')
-namelist = [x for x in nameset]
-print('5')
 # with open(ofname_tplg, 'w') as outfile:
 #     json.dump(tplglist, outfile)
 # del(tplglist)
-print('1')
+# print('1')
 # with open(ofname_cnt, 'w') as outfile:
 #     json.dump(cntlist, outfile)
 # del(cntlist)
-print('2')
-with open(ofname_As, 'w') as outfile:
-    json.dump(A_s, outfile)
-del(A_s)
-with open(ofname_Ar, 'w') as outfile:
-    json.dump(A_r, outfile)
-del(A_r)
-print('3')
-with open(ofname_dicts, 'w') as outfile:
-    json.dump(dict_s, outfile)
-del(dict_s)
-print('4')
+# print('2')
+
+
 with open(ofname_dictr, 'w') as outfile:
     json.dump(dict_r, outfile)
 del(dict_r)
-print('5')
-with open(ofname_nl, 'w') as outfile:
-    json.dump(namelist, outfile)
-del(namelist)
 print('6')
-with open(ofname_inform, 'w') as outfile:
-    json.dump(inform, outfile)
-del(inform)
-print('7')
 with open(ofname_dictr_mark, 'w') as outfile:
     json.dump(dict_r_mark, outfile)
 del(dict_r_mark)
-print('8')
-with open(ofname_dicts_mark, 'w') as outfile:
-    json.dump(dict_s_mark, outfile)
-del(dict_s_mark)
-print('9')
+print('7')
+
 
 
 
