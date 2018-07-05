@@ -353,7 +353,7 @@
 						info['lng'] = 123.4315;
 					}
 					return{
-						position: {'lat': info['lat'], 'lng': info['lng']},
+						position: {'lat': info['lat'] + Math.random()/3, 'lng': info['lng'] + Math.random()/3},
 						color: "yellow",
 						id: info["company_id"],
 						mb: info['main_business'],

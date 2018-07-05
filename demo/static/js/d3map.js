@@ -131,7 +131,7 @@ maps = {
         .selectAll("circle")
         .data(points.slice(points.length-1, points.length))
         .enter().append("circle")
-        .attr("transform", function(d) { return "translate(" + proj([d.position.lng+Math.random()/3, d.position.lat+Math.random()/3]) + ")"; })
+        .attr("transform", function(d) { return "translate(" + proj([d.position.lng, d.position.lat]) + ")"; })
         .attr("r", pointMax)
         .style("fill", function(d) { return d.color; })
         .on("mouseover", function(d) {
@@ -157,7 +157,7 @@ maps = {
         .selectAll("circle")
         .data(points.slice(0,(points.length-1)))
         .enter().append("circle")
-        .attr("transform", function(d) { return "translate(" + proj([d.position.lng+Math.random()/3, d.position.lat+Math.random()/3]) + ")"; })
+        .attr("transform", function(d) { return "translate(" + proj([d.position.lng, d.position.lat]) + ")"; })
         .attr("r", function(d)  { return Math.sqrt(d.score*100) > pointMax ? pointMax : (Math.sqrt(d.score*100) < pointMin ? pointMin : Math.sqrt(d.score *100));})
         .style("fill", function(d) { return d.color; })
         .on("mouseover", function(d) {
@@ -178,7 +178,7 @@ maps = {
                 .style("fill", function(d) {return d.color; });
             tip.hide();
         });
-    console.log(node);
+    // console.log(node); 
 
 
   },
