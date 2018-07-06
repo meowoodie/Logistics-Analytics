@@ -71,8 +71,11 @@ def recom(target, pca, km_pca, SimM1, SimM_ind, fv, A_sparse_send, NBS, NBR, nam
     x = target
     sim_v = np.array([])
     print("size of neighbor")
-    print(len(NBS[x]))
-    print(len(NBR[x]))
+    try:
+        print(len(NBS[x]))
+        print(len(NBR[x]))
+    except:
+        pass
 
     ## depth 2 similarity , to change to depth 1 similarity, can only compute
     ## sim_v = [sim(fv.loc[target], fv.loc[x]) for x in SimM_ind]
