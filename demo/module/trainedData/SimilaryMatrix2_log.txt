@@ -1,3 +1,0 @@
-Neighbor extracted by list
-Use Ar, As and fix feature vectors.
-2018-06-08T11:08:05.578988+08:00

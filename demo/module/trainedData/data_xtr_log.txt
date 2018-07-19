@@ -1,4 +1,0 @@
-Produced by xtr_in_subsample.py
-Add a dictionary for training(1) and testing(-1).
-Code starts at: 2018-06-08T11:03:01.990827+08:00
-Code ends at: 2018-06-08T11:03:12.429654+08:00
